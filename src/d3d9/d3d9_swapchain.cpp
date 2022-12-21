@@ -343,7 +343,7 @@ namespace dxvk {
     if (!similar || srcImage->info().extent != dstTexInfo->GetExtent()) {
       DxvkImageCreateInfo blitCreateInfo;
       blitCreateInfo.type          = VK_IMAGE_TYPE_2D;
-      blitCreateInfo.format        = dstTexInfo->GetFormatMapping().Format;
+      blitCreateInfo.format        = m_parent->GetOptions()->upgradeRenderTargets ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().Format;
       blitCreateInfo.flags         = 0;
       blitCreateInfo.sampleCount   = VK_SAMPLE_COUNT_1_BIT;
       blitCreateInfo.extent        = dstTexInfo->GetExtent();
@@ -1168,8 +1168,14 @@ namespace dxvk {
         return { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
 
       case D3D9Format::A8B8G8R8:
-      case D3D9Format::X8B8G8R8:
-        return { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
+      case D3D9Format::X8B8G8R8: {
+        if (m_parent->GetOptions()->upgradeRenderTargets){
+          return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+        }
+        else{
+          return { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
+        }
+      }
 
       case D3D9Format::A2R10G10B10:
         return { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
