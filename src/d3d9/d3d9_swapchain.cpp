@@ -331,7 +331,7 @@ namespace dxvk {
     if (!similar || srcImage->info().extent != dstTexInfo->GetExtent()) {
       DxvkImageCreateInfo blitCreateInfo;
       blitCreateInfo.type          = VK_IMAGE_TYPE_2D;
-      blitCreateInfo.format        = dstTexInfo->GetFormatMapping().FormatColor;
+      blitCreateInfo.format        = m_parent->GetOptions()->upgradeRenderTargets ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().FormatColor;
       blitCreateInfo.flags         = 0;
       blitCreateInfo.sampleCount   = VK_SAMPLE_COUNT_1_BIT;
       blitCreateInfo.extent        = dstTexInfo->GetExtent();
@@ -1109,13 +1109,19 @@ namespace dxvk {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));      
      [[fallthrough]];
-
+      
       case D3D9Format::A8R8G8B8:
       case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
       case D3D9Format::X8B8G8R8: {
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
+        if (m_parent->GetOptions()->upgradeRenderTargets){
+          pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+          pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
+        }
+        else{
+          pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
+          pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
+        }
       } break;
 
       case D3D9Format::A2R10G10B10:
@@ -1135,15 +1141,6 @@ namespace dxvk {
         pDstFormats[n++] = { VK_FORMAT_B5G6R5_UNORM_PACK16, m_colorspace };
         pDstFormats[n++] = { VK_FORMAT_R5G6B5_UNORM_PACK16, m_colorspace };
       } break;
-
-      case D3D9Format::A16B16G16R16F: {
-        if (m_unlockAdditionalFormats) {
-          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, m_colorspace };
-        } else {
-          Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));      
-        }
-        break;
-      }
     }
 
     return n;
