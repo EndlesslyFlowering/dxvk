@@ -38,8 +38,16 @@ namespace dxvk {
     if (IsPoolManaged(m_desc.Pool)) {
       SetAllNeedUpload();
     }
-
-    m_mapping = pDevice->LookupFormat(m_desc.Format);
+    if (m_device->GetOptions()->upgradeRenderTargets && ((m_desc.Usage & D3DUSAGE_RENDERTARGET)
+        && (m_desc.Format == D3D9Format::A8R8G8B8
+        || m_desc.Format == D3D9Format::X8R8G8B8
+        || m_desc.Format == D3D9Format::A8B8G8R8
+        || m_desc.Format == D3D9Format::X8B8G8R8)) ){
+      m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16F);
+    }
+    else{
+      m_mapping = pDevice->LookupFormat(m_desc.Format);
+    }
 
     m_mapMode        = DetermineMapMode();
     m_shadow         = DetermineShadowState();
