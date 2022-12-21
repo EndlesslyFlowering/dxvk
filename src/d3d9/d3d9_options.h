@@ -144,6 +144,9 @@ namespace dxvk {
     /// Clamps negative LOD bias
     bool clampNegativeLodBias;
 
+    /// Upgrades 8 bit RTs to 16 bit
+    bool upgradeRenderTargets;
+
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;
 
