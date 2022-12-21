@@ -143,6 +143,9 @@ namespace dxvk {
     /// Don't use non seamless cube maps
     bool seamlessCubes;
 
+    /// Upgrades 8 bit RTs to 16 bit
+    bool upgradeRenderTargets;
+
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;
 
