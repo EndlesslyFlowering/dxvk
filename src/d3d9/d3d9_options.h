@@ -1,5 +1,7 @@
 #pragma once
 
+#include <d3d9.h>
+
 #include "../util/config/config.h"
 #include "../dxvk/dxvk_device.h"
 
@@ -144,8 +146,44 @@ namespace dxvk {
     /// Clamps negative LOD bias
     bool clampNegativeLodBias;
 
-    /// Upgrades 8 bit RTs to 16 bit
-    bool upgradeRenderTargets;
+    /// upgrades render targets
+    bool enableRenderTargetUpgrade;
+
+    /// upgrade specific render target formats
+    D3DFORMAT upgrade_RGBA8_renderTargetTo;
+    D3DFORMAT upgrade_RGBX8_renderTargetTo;
+    D3DFORMAT upgrade_BGRA8_renderTargetTo;
+    D3DFORMAT upgrade_BGRX8_renderTargetTo;
+    D3DFORMAT upgrade_RGB10A2_renderTargetTo;
+    D3DFORMAT upgrade_BGR10A2_renderTargetTo;
+    D3DFORMAT upgrade_RGBA16_renderTargetTo;
+
+    /// enable upgrade swapchain
+    bool enableSwapchainUpgrade;
+
+    /// which output format to upgrade to
+    VkFormat upgradeSwapchainFormatTo;
+
+    /// output color space to upgrade to
+    VkColorSpaceKHR upgradeSwapchainColorSpaceTo;
+
+    /// Upgrade output format in the virtual D3D9 swapchain
+    /// may or may not cause issues. Basically cosmetics ;)
+    bool enableSwapchainFormatUpgradeInternal;
+
+    /// which internal output format upgrade to
+    D3DFORMAT upgradeSwapchainFormatInternalTo;
+
+    /// log formats used
+    bool logRenderTargetFormatsUsed;
+
+    /// log formats used
+    bool logFormatsUsed;
+
+    /// enfore fullscreen exclusive or windowed mode
+    /// for the internal swapchain
+    bool enforceWindowModeInternally;
+    WINBOOL enforcedWindowModeInternally;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstring>
+#include <dxgiformat.h>
 
 #include "../dxgi/dxgi_monitor.h"
 #include "../dxgi/dxgi_surface.h"
@@ -366,7 +367,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11: resource view upgrade: ",
+                                  GetDXGIFormatNameAsString(orgFormat),
+                                  " -> ",
+                                  GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11ShaderResourceView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
@@ -443,7 +457,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11:           UAV upgrade: ",
+                                 GetDXGIFormatNameAsString(orgFormat),
+                                 " -> ",
+                                 GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11UnorderedAccessView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
@@ -528,7 +555,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11:           RTV upgrade: ",
+                                 GetDXGIFormatNameAsString(orgFormat),
+                                 " -> ",
+                                 GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11RenderTargetView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
@@ -2641,7 +2681,11 @@ namespace dxvk {
   }
 
 
-  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateUnorderedAccessViewAndGetDriverHandleNVX(ID3D11Resource* pResource, const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDesc, ID3D11UnorderedAccessView** ppUAV, uint32_t* pDriverHandle) {
+  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateUnorderedAccessViewAndGetDriverHandleNVX(
+          ID3D11Resource*                    pResource,
+    const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDesc,
+          ID3D11UnorderedAccessView**        ppUAV,
+          uint32_t*                          pDriverHandle) {
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     if (!SUCCEEDED(GetCommonResourceDesc(pResource, &resourceDesc))) {
       Logger::warn("CreateUnorderedAccessViewAndGetDriverHandleNVX() - GetCommonResourceDesc() failed");
@@ -2686,7 +2730,11 @@ namespace dxvk {
   }
 
 
-  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateShaderResourceViewAndGetDriverHandleNVX(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDesc, ID3D11ShaderResourceView** ppSRV, uint32_t* pDriverHandle) {
+  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateShaderResourceViewAndGetDriverHandleNVX(
+          ID3D11Resource*                   pResource,
+    const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDesc,
+          ID3D11ShaderResourceView**        ppSRV,
+          uint32_t*                         pDriverHandle) {
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     if (!SUCCEEDED(GetCommonResourceDesc(pResource, &resourceDesc))) {
       Logger::warn("CreateShaderResourceViewAndGetDriverHandleNVX() - GetCommonResourceDesc() failed");
@@ -3012,12 +3060,18 @@ namespace dxvk {
 
   HRESULT STDMETHODCALLTYPE DXGIVkSwapChainFactory::CreateSwapChain(
           IDXGIVkSurfaceFactory*    pSurfaceFactory,
-    const DXGI_SWAP_CHAIN_DESC1*    pDesc,
+    const DXGI_SWAP_CHAIN_DESC1*    pDescOrg,
           IDXGIVkSwapChain**        ppSwapChain) {
     InitReturnPtr(ppSwapChain);
 
     try {
       auto vki = m_device->GetDXVKDevice()->adapter()->vki();
+
+      //pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+      DXGI_SWAP_CHAIN_DESC1  pDescDat = *pDescOrg;
+      DXGI_SWAP_CHAIN_DESC1 *pDesc    = &pDescDat;
+      pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+      Logger::info(str::format("D3D11: create swap chain: ", GetDXGIFormatNameAsString(pDesc->Format)));
 
       Com<D3D11SwapChain> presenter = new D3D11SwapChain(
         m_container, m_device, pSurfaceFactory, pDesc);
