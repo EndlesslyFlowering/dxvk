@@ -19,6 +19,27 @@ namespace dxvk {
   : m_interface(pInterface), m_device(pDevice), m_dimension(Dimension), m_desc(*pDesc),
     m_11on12(p11on12Info ? *p11on12Info : D3D11_ON_12_RESOURCE_INFO()), m_dxgiUsage(DxgiUsage) {
     DXGI_VK_FORMAT_MODE   formatMode   = GetFormatMode();
+    // DXGI_VK_FORMAT_MODE_COLOR is always a render target
+    if (pDevice->GetOptions()->upgradeRenderTargets
+     && formatMode == DXGI_VK_FORMAT_MODE_COLOR) {
+      const DXGI_FORMAT orgFormat = pDesc->Format;
+      m_desc.Format = upgradeRenderTarget(pDesc->Format, pDevice->GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (pDevice->GetOptions()->logRenderTargetUpgrades) {
+        if (orgFormat != m_desc.Format) {
+          Logger::info(str::format("D3D11: render target upgrade: ",
+                                   GetDXGIFormatNameAsString(orgFormat),
+                                   " -> ",
+                                   GetDXGIFormatNameAsString(m_desc.Format)));
+        }
+        else
+          Logger::info(str::format("D3D11:   other render target: ",
+                                   GetDXGIFormatNameAsString(m_desc.Format)));
+      }
+    }
+    else if (pDevice->GetOptions()->logRenderTargetUpgrades) {
+      Logger::info(str::format("D3D11:     other format used: ",
+                               GetDXGIFormatNameAsString(m_desc.Format)));
+    }
     DXGI_VK_FORMAT_INFO   formatInfo   = m_device->LookupFormat(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_FAMILY formatFamily = m_device->LookupFamily(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_INFO   formatPacked = m_device->LookupPackedFormat(m_desc.Format, formatMode);

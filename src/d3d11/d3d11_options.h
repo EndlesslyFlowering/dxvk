@@ -109,6 +109,34 @@ namespace dxvk {
     /// this is not supported when running on an AMD GPU.
     bool exposeDriverCommandLists = true;
 
+    bool upgradeRenderTargets;
+
+    std::string upgrade_R16G16B16A16_TYPELESS;
+    std::string upgrade_R16G16B16A16_UNORM;
+    std::string upgrade_R16G16B16A16_UINT;
+    std::string upgrade_R16G16B16A16_SNORM;
+    std::string upgrade_R16G16B16A16_SINT;
+    std::string upgrade_R10G10B10A2_TYPELESS;
+    std::string upgrade_R10G10B10A2_UNORM;
+    std::string upgrade_R10G10B10A2_UINT;
+    std::string upgrade_R11G11B10_FLOAT;
+    std::string upgrade_R8G8B8A8_TYPELESS;
+    std::string upgrade_R8G8B8A8_UNORM;
+    std::string upgrade_R8G8B8A8_UNORM_SRGB;
+    std::string upgrade_R8G8B8A8_UINT;
+    std::string upgrade_R8G8B8A8_SNORM;
+    std::string upgrade_R8G8B8A8_SINT;
+    std::string upgrade_B8G8R8A8_UNORM;
+    std::string upgrade_B8G8R8X8_UNORM;
+    std::string upgrade_B8G8R8A8_TYPELESS;
+    std::string upgrade_B8G8R8A8_UNORM_SRGB;
+    std::string upgrade_B8G8R8X8_TYPELESS;
+    std::string upgrade_B8G8R8X8_UNORM_SRGB;
+
+    bool upgradeRenderTargetsDepthOnly;
+
+    bool logRenderTargetUpgrades;
+
     /// Ensure that for the same D3D commands the output VK commands
     /// don't change between runs. Useful for comparative benchmarking,
     /// can negatively affect performance.
