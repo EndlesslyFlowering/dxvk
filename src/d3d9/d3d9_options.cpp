@@ -6,6 +6,50 @@
 
 namespace dxvk {
 
+  D3DFORMAT D3DFMT_UpgradeHelper(const std::string str) {
+    if (str == "disabled")
+      return D3DFMT_UNKNOWN;
+    else if (str == "rgb10a2")
+      return D3DFMT_A2B10G10R10;
+    else if (str == "bgr10a2")
+      return D3DFMT_A2R10G10B10;
+    else if (str == "rgba16")
+      return D3DFMT_A16B16G16R16;
+    else if (str == "rgba32f")
+      return D3DFMT_A32B32G32R32F;
+    else
+      return D3DFMT_A16B16G16R16F;
+  }
+
+  D3DFORMAT D3DFMT_RGBA16_UpgradeHelper(const std::string str) {
+    if (str == "disabled")
+      return D3DFMT_UNKNOWN;
+    else if (str == "rgba32f")
+      return D3DFMT_A32B32G32R32F;
+    else
+      return D3DFMT_A16B16G16R16F;
+  }
+
+  VkFormat VkFormat_UpgradeHelper(const std::string str) {
+    if (str == "disabled")
+      return VK_FORMAT_UNDEFINED;
+    else if (str == "rgb10a2")
+      return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+    else if (str == "bgr10a2")
+      return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
+    else if (str == "rgba16")
+      return VK_FORMAT_R16G16B16A16_UNORM;
+    else
+      return VK_FORMAT_R16G16B16A16_SFLOAT;
+  }
+
+  WINBOOL D3D9_WindowModeHelper(const std::string str) {
+    if (str == "windowed")
+      return TRUE;
+    else
+      return FALSE;
+  }
+
   static int32_t parsePciId(const std::string& str) {
     if (str.size() != 4)
       return -1;
@@ -76,13 +120,63 @@ namespace dxvk {
     this->clampNegativeLodBias          = config.getOption<bool>        ("d3d9.clampNegativeLodBias",          false);
     this->countLosableResources         = config.getOption<bool>        ("d3d9.countLosableResources",         true);
     this->reproducibleCommandStream     = config.getOption<bool>        ("d3d9.reproducibleCommandStream",     false);
-    this->upgradeRenderTargets          = config.getOption<bool>        ("d3d9.upgradeRenderTargets",          false);
 
     // D3D8 options
     this->drefScaling                   = config.getOption<int32_t>     ("d3d8.scaleDref",                     0);
 
     // Clamp LOD bias so that people don't abuse this in unintended ways
     this->samplerLodBias = dxvk::fclamp(this->samplerLodBias, -2.0f, 1.0f);
+
+    //HDR-mod start
+    this->enableRenderTargetUpgrade            = config.getOption<bool> ("d3d9.enableRenderTargetUpgrade",            false);
+    this->enableSwapchainUpgrade               = config.getOption<bool> ("d3d9.enableSwapchainUpgrade",               false);
+    this->enableSwapchainFormatUpgradeInternal = config.getOption<bool> ("d3d9.enableSwapchainFormatUpgradeInternal", false);
+    this->logRenderTargetFormatsUsed           = config.getOption<bool> ("d3d9.logRenderTargetFormatsUsed",           false);
+    this->logFormatsUsed                       = config.getOption<bool> ("d3d9.logFormatsUsed",                       false);
+
+
+    this->upgradeSwapchainFormatTo =
+      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatTo", "rgba16f")));
+    this->upgradeSwapchainFormatInternalTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatInternalTo", "rgba16f")));
+
+    std::string strUpgradeSwapchainColorSpaceTo =
+      Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainColorSpaceTo", "scRGB"));
+    if (strUpgradeSwapchainColorSpaceTo == "disabled")
+      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    else if (strUpgradeSwapchainColorSpaceTo == "bt709_non_linear")
+      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
+    else if (strUpgradeSwapchainColorSpaceTo == "pq")
+      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_HDR10_ST2084_EXT;
+    else if (strUpgradeSwapchainColorSpaceTo == "bt2020_linear")
+      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_BT2020_LINEAR_EXT;
+    else
+      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+
+    this->upgrade_RGBA8_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA8_renderTargetTo",   "rgba16f")));
+    this->upgrade_RGBX8_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBX8_renderTargetTo",   "rgba16f")));
+    this->upgrade_BGRA8_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRA8_renderTargetTo",   "rgba16f")));
+    this->upgrade_BGRX8_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRX8_renderTargetTo",   "rgba16f")));
+    this->upgrade_RGB10A2_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGB10A2_renderTargetTo", "rgba16f")));
+    this->upgrade_BGR10A2_renderTargetTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGR10A2_renderTargetTo", "rgba16f")));
+    this->upgrade_RGBA16_renderTargetTo = /*default to rgba16f for memory budget reasons*/
+      D3DFMT_RGBA16_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA16_renderTargetTo", "rgba16f")));
+
+    std::string strEnforceWindowModeInternally =
+      Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
+    if (strEnforceWindowModeInternally == "windowed" || strEnforceWindowModeInternally == "fullscreen")
+      this->enforceWindowModeInternally = true;
+    else
+      this->enforceWindowModeInternally = false;
+    this->enforcedWindowModeInternally = D3D9_WindowModeHelper(strEnforceWindowModeInternally);
+    //HDR-mod end
+
 
     std::string floatEmulation = Config::toLower(config.getOption<std::string>("d3d9.floatEmulation", "auto"));
     if (floatEmulation == "strict") {
