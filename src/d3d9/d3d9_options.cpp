@@ -72,9 +72,12 @@ namespace dxvk {
     this->deviceLocalConstantBuffers    = config.getOption<bool>        ("d3d9.deviceLocalConstantBuffers",    false);
     this->allowDirectBufferMapping      = config.getOption<bool>        ("d3d9.allowDirectBufferMapping",      true);
     this->seamlessCubes                 = config.getOption<bool>        ("d3d9.seamlessCubes",                 false);
-    this->textureMemory                 = config.getOption<int32_t>     ("d3d9.textureMemory",                100) << 20;
+    this->textureMemory                 = config.getOption<int32_t>     ("d3d9.textureMemory",                 100) << 20;
     this->deviceLost                    = config.getOption<bool>        ("d3d9.deviceLost",                    false);
-    this->upgradeRenderTargets          = config.getOption<bool>        ("d3d9.upgradeRenderTargets",          false);
+    this->upgrade8bitRenderTargets      = config.getOption<bool>        ("d3d9.upgrade8bitRenderTargets",      false);
+    this->upgrade10bitRenderTargets     = config.getOption<bool>        ("d3d9.upgrade10bitRenderTargets",     false);
+    this->upgradeOutputFormat           = config.getOption<bool>        ("d3d9.upgradeOutputFormat",           false);
+    this->upgradeOutputColorSpaceToPQ   = config.getOption<bool>        ("d3d9.upgradeOutputColorSpaceToPQ",   false);
 
     std::string floatEmulation = Config::toLower(config.getOption<std::string>("d3d9.floatEmulation", "auto"));
     if (floatEmulation == "strict") {

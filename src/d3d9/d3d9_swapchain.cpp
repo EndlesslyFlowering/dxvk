@@ -325,7 +325,7 @@ namespace dxvk {
     if (!similar || srcImage->info().extent != dstTexInfo->GetExtent()) {
       DxvkImageCreateInfo blitCreateInfo;
       blitCreateInfo.type          = VK_IMAGE_TYPE_2D;
-      blitCreateInfo.format        = m_parent->GetOptions()->upgradeRenderTargets ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().FormatColor;
+      blitCreateInfo.format        = m_parent->GetOptions()->upgradeOutputFormat ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().FormatColor;
       blitCreateInfo.flags         = 0;
       blitCreateInfo.sampleCount   = VK_SAMPLE_COUNT_1_BIT;
       blitCreateInfo.extent        = dstTexInfo->GetExtent();
@@ -1086,11 +1086,17 @@ namespace dxvk {
       case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
       case D3D9Format::X8B8G8R8: {
-        if (m_parent->GetOptions()->upgradeRenderTargets){
-          pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-          pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        if (m_parent->GetOptions()->upgradeOutputFormat) {
+          if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+          }
+          else {
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+          }
         }
-        else{
+        else {
           pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
           pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
         }
@@ -1098,9 +1104,15 @@ namespace dxvk {
 
       case D3D9Format::A2R10G10B10:
       case D3D9Format::A2B10G10R10: {
-        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-      } break;
+          if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+          }
+          else {
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+          }
+        } break;
 
       case D3D9Format::X1R5G5B5:
       case D3D9Format::A1R5G5B5: {

@@ -144,7 +144,17 @@ namespace dxvk {
     bool seamlessCubes;
 
     /// Upgrades 8 bit RTs to 16 bit
-    bool upgradeRenderTargets;
+    bool upgrade8bitRenderTargets;
+
+    /// Upgrades 10 bit RTs to 16 bit
+    bool upgrade10bitRenderTargets;
+
+    /// Upgrade output format to 10 bit
+    bool upgradeOutputFormat;
+
+    /// Upgrade 8 and 10 bit output formats to use PQ as color space.
+    /// for compatability reasons only works for 8 bit output formats if 'upgradeOutputFormat' is enabled too
+    bool upgradeOutputColorSpaceToPQ;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;

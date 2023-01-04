@@ -37,14 +37,21 @@ namespace dxvk {
         throw DxvkError("D3D9: Incompatible pool type for texture sharing.");
       }
     }
-    if (m_device->GetOptions()->upgradeRenderTargets && ((m_desc.Usage & D3DUSAGE_RENDERTARGET)
-        && (m_desc.Format == D3D9Format::A8R8G8B8
-        || m_desc.Format == D3D9Format::X8R8G8B8
-        || m_desc.Format == D3D9Format::A8B8G8R8
-        || m_desc.Format == D3D9Format::X8B8G8R8)) ){
-      m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16F);
+    if (m_device->GetOptions()->upgrade8bitRenderTargets && ((m_desc.Usage & D3DUSAGE_RENDERTARGET)
+      && (m_desc.Format == D3D9Format::A8R8G8B8
+       || m_desc.Format == D3D9Format::X8R8G8B8
+       || m_desc.Format == D3D9Format::A8B8G8R8
+       || m_desc.Format == D3D9Format::X8B8G8R8))) {
+      m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16);
+      //Logger::info("D3D9: 8bit format converted to 16bit");
     }
-    else{
+    else if (m_device->GetOptions()->upgrade10bitRenderTargets && ((m_desc.Usage & D3DUSAGE_RENDERTARGET)
+      && (m_desc.Format == D3D9Format::A2R10G10B10
+       || m_desc.Format == D3D9Format::A2B10G10R10))) {
+      m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16);
+      //Logger::info("D3D9: 10bit format converted to 16bit");
+    }
+    else {
       m_mapping = pDevice->LookupFormat(m_desc.Format);
     }
 
