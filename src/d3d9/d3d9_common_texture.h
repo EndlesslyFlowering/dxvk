@@ -484,6 +484,14 @@ namespace dxvk {
 
   private:
 
+    void RtUpgradeLogger(
+            D3D9Format originalFormat,
+            D3D9Format upgradedFormat);
+
+    void FormatLogger(
+            D3D9Format Format,
+            bool       isRt);
+
     D3D9DeviceEx*                 m_device;
     D3D9_COMMON_TEXTURE_DESC      m_desc;
     D3DRESOURCETYPE               m_type;
