@@ -342,7 +342,7 @@ namespace dxvk {
     if (!similar || srcImage->info().extent != dstTexInfo->GetExtent()) {
       DxvkImageCreateInfo blitCreateInfo;
       blitCreateInfo.type          = VK_IMAGE_TYPE_2D;
-      blitCreateInfo.format        = m_parent->GetOptions()->upgradeRenderTargets ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().FormatColor;
+      blitCreateInfo.format        = dstTexInfo->GetFormatMapping().FormatColor;
       blitCreateInfo.flags         = 0;
       blitCreateInfo.sampleCount   = VK_SAMPLE_COUNT_1_BIT;
       blitCreateInfo.extent        = dstTexInfo->GetExtent();
@@ -1155,30 +1155,67 @@ namespace dxvk {
   VkSurfaceFormatKHR D3D9SwapChainEx::GetSurfaceFormat() {
     D3D9Format format = EnumerateFormat(m_presentParams.BackBufferFormat);
 
+    VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeSwapchainFormatTo;
+    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeSwapchainColorSpaceTo;
+
     switch (format) {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", format));
         [[fallthrough]];
 
       case D3D9Format::A8R8G8B8:
-      case D3D9Format::X8R8G8B8:
-        return { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
+      case D3D9Format::X8R8G8B8: {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade
+         && (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT
+          || ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM
+          || ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+          || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32)) {
+            return { ugFmtTo, ugCspTo };
+        }
+        else {
+          return { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
+        }
+      }
 
       case D3D9Format::A8B8G8R8:
       case D3D9Format::X8B8G8R8: {
-        if (m_parent->GetOptions()->upgradeRenderTargets){
-          return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+        if (m_parent->GetOptions()->enableSwapchainUpgrade
+         && (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT
+          || ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM
+          || ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+          || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32)) {
+            return { ugFmtTo, ugCspTo };
         }
-        else{
+        else {
           return { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
         }
       }
 
-      case D3D9Format::A2R10G10B10:
-        return { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
+      case D3D9Format::A2R10G10B10: {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade
+         && (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT
+          || ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM
+          || ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+          || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32)) {
+            return { ugFmtTo, ugCspTo };
+        }
+        else {
+          return { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
+        }
+      }
 
-      case D3D9Format::A2B10G10R10:
-        return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+      case D3D9Format::A2B10G10R10: {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade
+         && (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT
+          || ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM
+          || ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+          || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32)) {
+            return { ugFmtTo, ugCspTo };
+        }
+        else {
+          return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+        }
+      }
 
       case D3D9Format::X1R5G5B5:
       case D3D9Format::A1R5G5B5:
