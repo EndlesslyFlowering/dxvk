@@ -570,7 +570,7 @@ namespace dxvk {
     desc.Depth              = 1;
     desc.MipLevels          = 1;
     desc.ArraySize          = 1;
-    desc.Format             = m_desc.Format;
+    desc.Format             = DXGI_FORMAT_R10G10B10A2_UNORM;
     desc.SampleDesc         = m_desc.SampleDesc;
     desc.Usage              = D3D11_USAGE_DEFAULT;
     desc.BindFlags          = 0;
@@ -692,14 +692,14 @@ namespace dxvk {
       
       case DXGI_FORMAT_R8G8B8A8_UNORM:
       case DXGI_FORMAT_B8G8R8A8_UNORM: {
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, m_colorspace };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
       } break;
       
       case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: {
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_SRGB, m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_SRGB, m_colorspace };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
       } break;
       
       case DXGI_FORMAT_R10G10B10A2_UNORM: {
