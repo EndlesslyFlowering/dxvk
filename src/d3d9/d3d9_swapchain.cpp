@@ -973,7 +973,7 @@ namespace dxvk {
     desc.Depth              = 1;
     desc.MipLevels          = 1;
     desc.ArraySize          = 1;
-    desc.Format             = EnumerateFormat(m_presentParams.BackBufferFormat);
+    desc.Format             = m_parent->GetOptions()->upgradeOutputFormat ? D3D9Format::A2R10G10B10 : EnumerateFormat(m_presentParams.BackBufferFormat);
     desc.MultiSample        = m_presentParams.MultiSampleType;
     desc.MultisampleQuality = m_presentParams.MultiSampleQuality;
     desc.Pool               = D3DPOOL_DEFAULT;
