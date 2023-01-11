@@ -43,16 +43,28 @@ namespace dxvk {
        || m_desc.Format == D3D9Format::A8B8G8R8
        || m_desc.Format == D3D9Format::X8B8G8R8))) {
       m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16);
-      //Logger::info("D3D9: 8bit format converted to 16bit");
+      if (m_device->GetOptions()->logRenderTargetUpgrades) {
+        Logger::info(str::format("D3D9: render target upgrade: ", m_desc.Format, " -> A16B16G16R16"));
+      }
     }
     else if (m_device->GetOptions()->upgrade10bitRenderTargets && ((m_desc.Usage & D3DUSAGE_RENDERTARGET)
       && (m_desc.Format == D3D9Format::A2R10G10B10
        || m_desc.Format == D3D9Format::A2B10G10R10))) {
       m_mapping = ConvertFormatUnfixed(D3D9Format::A16B16G16R16);
-      //Logger::info("D3D9: 10bit format converted to 16bit");
+      if (m_device->GetOptions()->logRenderTargetUpgrades) {
+        Logger::info(str::format("D3D9: render target upgrade: ", m_desc.Format, " -> A16B16G16R16"));
+      }
     }
     else {
       m_mapping = pDevice->LookupFormat(m_desc.Format);
+      if (m_device->GetOptions()->logRenderTargetUpgrades) {
+        if (m_desc.Usage & D3DUSAGE_RENDERTARGET) {
+          Logger::info(str::format("D3D9: used render target format: ", m_desc.Format));
+        }
+        else {
+          Logger::info(str::format("D3D9: used D3D9 format: ", m_desc.Format));
+        }
+      }
     }
 
     m_mapMode        = DetermineMapMode();

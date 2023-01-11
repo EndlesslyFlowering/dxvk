@@ -76,6 +76,7 @@ namespace dxvk {
     this->deviceLost                    = config.getOption<bool>        ("d3d9.deviceLost",                    false);
     this->upgrade8bitRenderTargets      = config.getOption<bool>        ("d3d9.upgrade8bitRenderTargets",      false);
     this->upgrade10bitRenderTargets     = config.getOption<bool>        ("d3d9.upgrade10bitRenderTargets",     false);
+    this->logRenderTargetUpgrades       = config.getOption<bool>        ("d3d9.logRenderTargetUpgrades",       false);
     this->upgradeOutputFormat           = config.getOption<bool>        ("d3d9.upgradeOutputFormat",           false);
     this->upgradeOutputColorSpaceToPQ   = config.getOption<bool>        ("d3d9.upgradeOutputColorSpaceToPQ",   false);
 

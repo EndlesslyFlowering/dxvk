@@ -149,6 +149,9 @@ namespace dxvk {
     /// Upgrades 10 bit RTs to 16 bit
     bool upgrade10bitRenderTargets;
 
+    /// log render target upgrade
+    bool logRenderTargetUpgrades;
+
     /// Upgrade output format to 10 bit
     bool upgradeOutputFormat;
 
