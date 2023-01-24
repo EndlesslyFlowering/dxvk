@@ -325,7 +325,7 @@ namespace dxvk {
     if (!similar || srcImage->info().extent != dstTexInfo->GetExtent()) {
       DxvkImageCreateInfo blitCreateInfo;
       blitCreateInfo.type          = VK_IMAGE_TYPE_2D;
-      blitCreateInfo.format        = m_parent->GetOptions()->upgradeOutputFormat ? VK_FORMAT_A2B10G10R10_UNORM_PACK32 : dstTexInfo->GetFormatMapping().FormatColor;
+      blitCreateInfo.format        = dstTexInfo->GetFormatMapping().FormatColor;
       blitCreateInfo.flags         = 0;
       blitCreateInfo.sampleCount   = VK_SAMPLE_COUNT_1_BIT;
       blitCreateInfo.extent        = dstTexInfo->GetExtent();
@@ -973,7 +973,7 @@ namespace dxvk {
     desc.Depth              = 1;
     desc.MipLevels          = 1;
     desc.ArraySize          = 1;
-    desc.Format             = m_parent->GetOptions()->upgradeOutputFormat ? D3D9Format::A2R10G10B10 : EnumerateFormat(m_presentParams.BackBufferFormat);
+    desc.Format             = EnumerateFormat(m_presentParams.BackBufferFormat);
     desc.MultiSample        = m_presentParams.MultiSampleType;
     desc.MultisampleQuality = m_presentParams.MultiSampleQuality;
     desc.Pool               = D3DPOOL_DEFAULT;
@@ -1081,7 +1081,7 @@ namespace dxvk {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));      
      [[fallthrough]];
-      
+
       case D3D9Format::A8R8G8B8:
       case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
@@ -1112,7 +1112,15 @@ namespace dxvk {
             pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
             pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
           }
-        } break;
+      } break;
+
+      case D3D9Format::A16B16G16R16: {
+        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+      } break;
+
+      case D3D9Format::A16B16G16R16F: {
+        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+      } break;
 
       case D3D9Format::X1R5G5B5:
       case D3D9Format::A1R5G5B5: {

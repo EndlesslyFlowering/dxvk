@@ -259,6 +259,8 @@ namespace dxvk {
           DWORD                  BehaviorFlags,
           D3DPRESENT_PARAMETERS* pPresentationParameters,
           IDirect3DDevice9**     ppReturnedDeviceInterface) {
+    pPresentationParameters->BackBufferFormat = D3DFMT_A16B16G16R16F;
+    pPresentationParameters->Windowed = FALSE;
     return this->CreateDeviceEx(
       Adapter,
       DeviceType,
