@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstring>
+#include <dxgiformat.h>
 
 #include "../dxgi/dxgi_monitor.h"
 #include "../dxgi/dxgi_surface.h"
@@ -129,6 +130,9 @@ namespace dxvk {
     desc.Depth          = 1;
     desc.MipLevels      = pDesc->MipLevels;
     desc.ArraySize      = pDesc->ArraySize;
+    //desc.Format         = pDesc->BindFlags == D3D11_BIND_RENDER_TARGET ?
+    //                      DXGI_FORMAT_R16G16B16A16_FLOAT
+    //                    : pDesc->Format;
     desc.Format         = pDesc->Format;
     desc.SampleDesc     = DXGI_SAMPLE_DESC { 1, 0 };
     desc.Usage          = pDesc->Usage;
@@ -174,6 +178,9 @@ namespace dxvk {
     desc.Height         = pDesc->Height;
     desc.MipLevels      = pDesc->MipLevels;
     desc.ArraySize      = pDesc->ArraySize;
+    //desc.Format         = pDesc->BindFlags == D3D11_BIND_RENDER_TARGET ?
+    //                      DXGI_FORMAT_R16G16B16A16_FLOAT
+    //                    : pDesc->Format;
     desc.Format         = pDesc->Format;
     desc.SampleDesc     = pDesc->SampleDesc;
     desc.Usage          = pDesc->Usage;
@@ -254,6 +261,9 @@ namespace dxvk {
     desc.Height         = pDesc->Height;
     desc.Depth          = pDesc->Depth;
     desc.MipLevels      = pDesc->MipLevels;
+    //desc.Format         = pDesc->BindFlags == D3D11_BIND_RENDER_TARGET ?
+    //                      DXGI_FORMAT_R16G16B16A16_FLOAT
+    //                    : pDesc->Format;
     desc.Format         = pDesc->Format;
     desc.Usage          = pDesc->Usage;
     desc.BindFlags      = pDesc->BindFlags;
@@ -366,7 +376,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11: resource view upgrade: ",
+                                  GetDXGIFormatNameAsString(orgFormat),
+                                  " -> ",
+                                  GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11ShaderResourceView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
@@ -443,7 +466,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11:           UAV upgrade: ",
+                                 GetDXGIFormatNameAsString(orgFormat),
+                                 " -> ",
+                                 GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11UnorderedAccessView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
@@ -2632,7 +2668,39 @@ namespace dxvk {
   }
 
 
-  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateUnorderedAccessViewAndGetDriverHandleNVX(ID3D11Resource* pResource, const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDesc, ID3D11UnorderedAccessView** ppUAV, uint32_t* pDriverHandle) {
+  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateUnorderedAccessViewAndGetDriverHandleNVX(
+          ID3D11Resource*                    pResource,
+    //const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDescOrg,
+    const D3D11_UNORDERED_ACCESS_VIEW_DESC*  pDesc,
+          ID3D11UnorderedAccessView**        ppUAV,
+          uint32_t*                          pDriverHandle) {
+    //D3D11_UNORDERED_ACCESS_VIEW_DESC  pDescData = *pDescOrg;
+    //D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc = &pDescData;
+    //if (pDesc->BindFlags & D3D11_BIND_RENDER_TARGET) {
+    //  if (pDesc->Format == DXGI_FORMAT_R16G16B16A16_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_UNORM
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_SNORM
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_SINT
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_UNORM
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R11G11B10_FLOAT
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_SNORM
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_SINT
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_UNORM_SRGB) {
+    //    pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    //   }
+    //}
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     if (!SUCCEEDED(GetCommonResourceDesc(pResource, &resourceDesc))) {
       Logger::warn("CreateUnorderedAccessViewAndGetDriverHandleNVX() - GetCommonResourceDesc() failed");
@@ -2677,7 +2745,39 @@ namespace dxvk {
   }
 
 
-  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateShaderResourceViewAndGetDriverHandleNVX(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDesc, ID3D11ShaderResourceView** ppSRV, uint32_t* pDriverHandle) {
+  bool STDMETHODCALLTYPE D3D11DeviceExt::CreateShaderResourceViewAndGetDriverHandleNVX(
+          ID3D11Resource*                   pResource,
+    //const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDescOrg,
+    const D3D11_SHADER_RESOURCE_VIEW_DESC*  pDesc,
+          ID3D11ShaderResourceView**        ppSRV,
+          uint32_t*                         pDriverHandle) {
+    //D3D11_SHADER_RESOURCE_VIEW_DESC  pDescData = *pDescOrg;
+    //D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc = &pDescData;
+    //if (pDesc->BindFlags & D3D11_BIND_RENDER_TARGET) {
+    //  if (pDesc->Format == DXGI_FORMAT_R16G16B16A16_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_UNORM
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_SNORM
+    //   || pDesc->Format == DXGI_FORMAT_R16G16B16A16_SINT
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_UNORM
+    //   || pDesc->Format == DXGI_FORMAT_R10G10B10A2_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R11G11B10_FLOAT
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_UINT
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_SNORM
+    //   || pDesc->Format == DXGI_FORMAT_R8G8B8A8_SINT
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_UNORM //maybe
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_TYPELESS
+    //   || pDesc->Format == DXGI_FORMAT_B8G8R8X8_UNORM_SRGB) {
+    //    pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    //   }
+    //}
     D3D11_COMMON_RESOURCE_DESC resourceDesc;
     if (!SUCCEEDED(GetCommonResourceDesc(pResource, &resourceDesc))) {
       Logger::warn("CreateShaderResourceViewAndGetDriverHandleNVX() - GetCommonResourceDesc() failed");
@@ -3003,12 +3103,18 @@ namespace dxvk {
 
   HRESULT STDMETHODCALLTYPE DXGIVkSwapChainFactory::CreateSwapChain(
           IDXGIVkSurfaceFactory*    pSurfaceFactory,
-    const DXGI_SWAP_CHAIN_DESC1*    pDesc,
+    const DXGI_SWAP_CHAIN_DESC1*    pDescOrg,
           IDXGIVkSwapChain**        ppSwapChain) {
     InitReturnPtr(ppSwapChain);
 
     try {
       auto vki = m_device->GetDXVKDevice()->adapter()->vki();
+
+      //pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+      DXGI_SWAP_CHAIN_DESC1  pDescDat = *pDescOrg;
+      DXGI_SWAP_CHAIN_DESC1 *pDesc    = &pDescDat;
+      pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+      Logger::info(str::format("D3D11: create swap chain: ", GetDXGIFormatNameAsString(pDesc->Format)));
 
       Com<D3D11SwapChain> presenter = new D3D11SwapChain(
         m_container, m_device, pSurfaceFactory, pDesc);
@@ -3205,8 +3311,20 @@ namespace dxvk {
     desc.MiscFlags      = 0;
 
     // Handle bind flags
-    if (Usage & DXGI_USAGE_RENDER_TARGET_OUTPUT)
+    if (Usage & DXGI_USAGE_RENDER_TARGET_OUTPUT) {
       desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+    //  if (GetOptions()->upgradeRenderTargets) {
+    //    const DXGI_FORMAT orgFormat = desc.Format;
+    //    desc.Format = upgradeRenderTarget(desc.Format);
+    //    if (GetOptions()->logRenderTargetUpgrades
+    //     && orgFormat != desc.Format) {
+    //      Logger::info(str::format("D3D11:        create surface: ",
+    //                               GetDXGIFormatNameAsString(orgFormat),
+    //                               " -> ",
+    //                               GetDXGIFormatNameAsString(desc.Format)));
+    //    }
+    //  }
+    }
 
     if (Usage & DXGI_USAGE_SHADER_INPUT)
       desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;

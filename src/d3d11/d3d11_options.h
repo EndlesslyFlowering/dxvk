@@ -118,6 +118,12 @@ namespace dxvk {
     /// race conditions.
     bool enableContextLock;
 
+    bool upgradeRenderTargets;
+
+    bool upgradeRenderTargetsDepthOnly;
+
+    bool logRenderTargetUpgrades;
+
     /// Shader dump path
     std::string shaderDumpPath;
   };

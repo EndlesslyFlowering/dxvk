@@ -85,7 +85,7 @@ namespace dxvk {
     D3D11CommonTexture(
             ID3D11Resource*             pInterface,
             D3D11Device*                pDevice,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
       const D3D11_ON_12_RESOURCE_INFO*  p11on12Info,
             D3D11_RESOURCE_DIMENSION    Dimension,
             DXGI_USAGE                  DxgiUsage,
@@ -93,6 +93,8 @@ namespace dxvk {
             HANDLE                      hSharedHandle);
     
     ~D3D11CommonTexture();
+
+    bool HDRhax(D3D11_COMMON_TEXTURE_DESC* pDesc);
     
     /**
      * \brief Retrieves resource interface
@@ -660,7 +662,7 @@ namespace dxvk {
     
     D3D11Texture1D(
             D3D11Device*                pDevice,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
       const D3D11_ON_12_RESOURCE_INFO*  p11on12Info);
     
     ~D3D11Texture1D();
@@ -706,20 +708,20 @@ namespace dxvk {
     
     D3D11Texture2D(
             D3D11Device*                pDevice,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
       const D3D11_ON_12_RESOURCE_INFO*  p11on12Info,
             HANDLE                      hSharedHandle);
 
     D3D11Texture2D(
             D3D11Device*                pDevice,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
             DXGI_USAGE                  DxgiUsage,
             VkImage                     vkImage);
     
     D3D11Texture2D(
             D3D11Device*                pDevice,
             IUnknown*                   pSwapChain,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
             DXGI_USAGE                  DxgiUsage);
     
     ~D3D11Texture2D();
@@ -773,7 +775,7 @@ namespace dxvk {
     
     D3D11Texture3D(
             D3D11Device*                pDevice,
-      const D3D11_COMMON_TEXTURE_DESC*  pDesc,
+            D3D11_COMMON_TEXTURE_DESC*  pDesc,
       const D3D11_ON_12_RESOURCE_INFO*  p11on12Info);
     
     ~D3D11Texture3D();
