@@ -564,7 +564,20 @@ namespace dxvk {
         return E_INVALIDARG;
     } else {
       desc = *pDesc;
-      
+
+    if (GetOptions()->upgradeRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      const DXGI_FORMAT orgFormat = desc.Format;
+      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
+      if (GetOptions()->logRenderTargetUpgrades
+       && orgFormat != desc.Format) {
+        Logger::info(str::format("D3D11:           RTV upgrade: ",
+                                 GetDXGIFormatNameAsString(orgFormat),
+                                 " -> ",
+                                 GetDXGIFormatNameAsString(desc.Format)));
+      }
+    }
+
       if (FAILED(D3D11RenderTargetView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
     }
