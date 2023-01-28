@@ -9,8 +9,8 @@ namespace dxvk {
     case D3D9Format::A8R8G8B8:
     case D3D9Format::X8R8G8B8: // This is still 32 bit even though the alpha is unspecified.
     case D3D9Format::A2R10G10B10:
-    case D3D9Format::A16B16G16R16:
-    case D3D9Format::A16B16G16R16F:
+    case D3D9Format::A16B16G16R16:  // definitely
+    case D3D9Format::A16B16G16R16F: // 32 bit :)
       return 32;
 
     case D3D9Format::A1R5G5B5:
@@ -31,7 +31,9 @@ namespace dxvk {
           D3D9Format Format) {
     // D3D9Format::X1R5G5B5 is unsupported by native drivers and some apps, 
     // such as the BGE SettingsApplication, rely on it not being exposed.
-    return Format == D3D9Format::A2R10G10B10
+    return Format == D3D9Format::A16B16G16R16F
+        || Format == D3D9Format::A16B16G16R16
+        || Format == D3D9Format::A2R10G10B10
         || Format == D3D9Format::X8R8G8B8
         || Format == D3D9Format::R5G6B5;
   }

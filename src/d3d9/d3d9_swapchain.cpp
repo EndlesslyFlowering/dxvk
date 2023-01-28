@@ -1115,7 +1115,9 @@ namespace dxvk {
       } break;
 
       case D3D9Format::A16B16G16R16: {
-        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
       } break;
 
       case D3D9Format::A16B16G16R16F: {
