@@ -34,7 +34,7 @@ namespace dxvk {
     };
 
   private:
-  
+
     D3D11Device* m_device;
 
     std::string GetDXGIFormatInfo(
