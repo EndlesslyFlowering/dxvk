@@ -7,7 +7,10 @@ namespace dxvk {
 
   class D3D11RTUpgradeHelper {
 
-  public:
+  public:  
+
+    uint32_t GetFormatID(
+      const DXGI_FORMAT Format);
 
     DXGI_FORMAT TranslateFormatString(
       DXGI_FORMAT inputFormat,
