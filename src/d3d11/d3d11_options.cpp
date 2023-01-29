@@ -36,6 +36,28 @@ namespace dxvk {
     this->upgradeRenderTargetsDepthOnly = config.getOption<bool>("d3d11.upgradeRenderTargetsDepthOnly", false);
     this->logRenderTargetUpgrades       = config.getOption<bool>("d3d11.logRenderTargetUpgrades", false);
 
+    this->upgrade_R16G16B16A16_TYPELESS = config.getOption<std::string>("d3d11.upgrade_R16G16B16A16_TYPELESS", "fp16");
+    this->upgrade_R16G16B16A16_UNORM    = config.getOption<std::string>("d3d11.upgrade_R16G16B16A16_UNORM",    "fp16");
+    this->upgrade_R16G16B16A16_UINT     = config.getOption<std::string>("d3d11.upgrade_R16G16B16A16_UINT",     "fp16");
+    this->upgrade_R16G16B16A16_SNORM    = config.getOption<std::string>("d3d11.upgrade_R16G16B16A16_SNORM",    "fp16");
+    this->upgrade_R16G16B16A16_SINT     = config.getOption<std::string>("d3d11.upgrade_R16G16B16A16_SINT",     "fp16");
+    this->upgrade_R10G10B10A2_TYPELESS  = config.getOption<std::string>("d3d11.upgrade_R10G10B10A2_TYPELESS",  "fp16");
+    this->upgrade_R10G10B10A2_UNORM     = config.getOption<std::string>("d3d11.upgrade_R10G10B10A2_UNORM",     "fp16");
+    this->upgrade_R10G10B10A2_UINT      = config.getOption<std::string>("d3d11.upgrade_R10G10B10A2_UINT",      "fp16");
+    this->upgrade_R11G11B10_FLOAT       = config.getOption<std::string>("d3d11.upgrade_R11G11B10_FLOAT",       "fp16");
+    this->upgrade_R8G8B8A8_TYPELESS     = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_TYPELESS",     "fp16");
+    this->upgrade_R8G8B8A8_UNORM        = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_UNORM",        "fp16");
+    this->upgrade_R8G8B8A8_UNORM_SRGB   = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_UNORM_SRGB",   "fp16");
+    this->upgrade_R8G8B8A8_UINT         = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_UINT",         "fp16");
+    this->upgrade_R8G8B8A8_SNORM        = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_SNORM",        "fp16");
+    this->upgrade_R8G8B8A8_SINT         = config.getOption<std::string>("d3d11.upgrade_R8G8B8A8_SINT",         "fp16");
+    this->upgrade_B8G8R8A8_UNORM        = config.getOption<std::string>("d3d11.upgrade_B8G8R8A8_UNORM",        "fp16");
+    this->upgrade_B8G8R8X8_UNORM        = config.getOption<std::string>("d3d11.upgrade_B8G8R8X8_UNORM",        "fp16");
+    this->upgrade_B8G8R8A8_TYPELESS     = config.getOption<std::string>("d3d11.upgrade_B8G8R8A8_TYPELESS",     "fp16");
+    this->upgrade_B8G8R8A8_UNORM_SRGB   = config.getOption<std::string>("d3d11.upgrade_B8G8R8A8_UNORM_SRGB",   "fp16");
+    this->upgrade_B8G8R8X8_TYPELESS     = config.getOption<std::string>("d3d11.upgrade_B8G8R8X8_TYPELESS",     "fp16");
+    this->upgrade_B8G8R8X8_UNORM_SRGB   = config.getOption<std::string>("d3d11.upgrade_B8G8R8X8_UNORM_SRGB",   "fp16");
+
     // Clamp LOD bias so that people don't abuse this in unintended ways
     this->samplerLodBias = dxvk::fclamp(this->samplerLodBias, -2.0f, 1.0f);
 
