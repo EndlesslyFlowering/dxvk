@@ -1088,12 +1088,15 @@ namespace dxvk {
       case D3D9Format::X8B8G8R8: {
         if (m_parent->GetOptions()->upgradeOutputFormat) {
           if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_HDR10_ST2084_EXT };
             pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
           }
           else {
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
             pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
           }
         }
         else {
@@ -1105,10 +1108,13 @@ namespace dxvk {
       case D3D9Format::A2R10G10B10:
       case D3D9Format::A2B10G10R10: {
           if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_HDR10_ST2084_EXT };
             pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
           }
           else {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
             pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
             pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
           }

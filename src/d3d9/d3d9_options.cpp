@@ -78,6 +78,8 @@ namespace dxvk {
     this->upgrade10bitRenderTargets     = config.getOption<bool>        ("d3d9.upgrade10bitRenderTargets",     false);
     this->logRenderTargetUpgrades       = config.getOption<bool>        ("d3d9.logRenderTargetUpgrades",       false);
     this->upgradeOutputFormat           = config.getOption<bool>        ("d3d9.upgradeOutputFormat",           false);
+    this->upgradeOutputFormatEarly      = config.getOption<bool>        ("d3d9.upgradeOutputFormatEarly",      false);
+    this->enforceFullscreenExclusive    = config.getOption<bool>        ("d3d9.enforceFullscreenExclusive",    false);
     this->upgradeOutputColorSpaceToPQ   = config.getOption<bool>        ("d3d9.upgradeOutputColorSpaceToPQ",   false);
 
     std::string floatEmulation = Config::toLower(config.getOption<std::string>("d3d9.floatEmulation", "auto"));

@@ -155,6 +155,14 @@ namespace dxvk {
     /// Upgrade output format to 10 bit
     bool upgradeOutputFormat;
 
+    /// Upgrade output format in the virtual D3D9 swapchain
+    /// may or may not cause issues
+    bool upgradeOutputFormatEarly;
+
+    // enforce fullscreen exclusive as a possible workaround to output HDR
+    // as it only works in FSE under Windows
+    bool enforceFullscreenExclusive;
+
     /// Upgrade 8 and 10 bit output formats to use PQ as color space.
     /// for compatability reasons only works for 8 bit output formats if 'upgradeOutputFormat' is enabled too
     bool upgradeOutputColorSpaceToPQ;
