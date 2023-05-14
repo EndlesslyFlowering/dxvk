@@ -261,7 +261,9 @@ namespace dxvk {
           IDirect3DDevice9**     ppReturnedDeviceInterface) {
     if (m_d3d9Options.upgradeOutputFormatInternal)
       pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeOutputFormatInternalTo;
-    if (m_d3d9Options.enforceFullscreenExclusiveInternally)
+    if (m_d3d9Options.enforceWindowModeInternally == "windowed")
+      pPresentationParameters->Windowed = TRUE;
+    else if (m_d3d9Options.enforceWindowModeInternally == "fullscreen")
       pPresentationParameters->Windowed = FALSE;
     return this->CreateDeviceEx(
       Adapter,

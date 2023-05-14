@@ -174,9 +174,9 @@ namespace dxvk {
     /// output color space to upgrade to
     VkColorSpaceKHR upgradeOutputColorSpaceTo;
 
-    // enforce fullscreen exclusive as a possible workaround to output HDR
-    // as it only works in FSE under Windows
-    bool enforceFullscreenExclusiveInternally;
+    /// enfore fullscreen exclusive or windowed mode
+    /// for the internal swapchain
+    std::string enforceWindowModeInternally;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;

@@ -102,11 +102,11 @@ namespace dxvk {
     this->deviceLost                    = config.getOption<bool>        ("d3d9.deviceLost",                    false);
 
     this->upgradeRenderTargets                 = config.getOption<bool>        ("d3d9.upgradeRenderTargets",          false);
-    this->logFormatsUsed                       = config.getOption<bool>        ("d3d9.logFormatsUsed",                false);
-    this->enforceFullscreenExclusiveInternally = config.getOption<bool>        ("d3d9.enforceFullscreenExclusive",    false);
-
     this->upgradeOutputFormat                  = config.getOption<bool>        ("d3d9.upgradeOutputFormat",           false);
     this->upgradeOutputFormatInternal          = config.getOption<bool>        ("d3d9.upgradeOutputFormatInternal",   false);
+    this->enforceWindowModeInternally          = config.getOption<std::string> ("d3d9.enforceWindowModeInternally",   "");
+    this->logFormatsUsed                       = config.getOption<bool>        ("d3d9.logFormatsUsed",                false);
+
 
     this->upgradeOutputFormatTo =
       VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeOutputFormatTo", "rgba16f")));
