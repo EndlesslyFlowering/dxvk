@@ -1077,57 +1077,87 @@ namespace dxvk {
           VkSurfaceFormatKHR*       pDstFormats) {
     uint32_t n = 0;
 
+    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeOutputColorSpaceTo;
+    VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeOutputFormatTo;
+
     switch (Format) {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));      
      [[fallthrough]];
 
+      // mappings are based on the format + color space the current AMD Windows driver supports
       case D3D9Format::A8R8G8B8:
       case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
       case D3D9Format::X8B8G8R8: {
         if (m_parent->GetOptions()->upgradeOutputFormat) {
-          if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_HDR10_ST2084_EXT };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
           }
-          else {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+          else if (ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
+          }
+          else if (ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+                || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32) {
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
           }
         }
-        else {
-          pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-          pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        }
+        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
       } break;
 
       case D3D9Format::A2R10G10B10:
       case D3D9Format::A2B10G10R10: {
-          if (m_parent->GetOptions()->upgradeOutputColorSpaceToPQ) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_HDR10_ST2084_EXT };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_HDR10_ST2084_EXT };
+        if (m_parent->GetOptions()->upgradeOutputFormat) {
+          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
           }
-          else {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+          else if (ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
+            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
           }
+        }
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
       } break;
 
       case D3D9Format::A16B16G16R16: {
+        if (m_parent->GetOptions()->upgradeOutputFormat) {
+          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
+          }
+        }
         pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
         pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
         pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
       } break;
 
       case D3D9Format::A16B16G16R16F: {
-        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+        if (m_parent->GetOptions()->upgradeOutputFormat) {
+          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
+            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
+          }
+        }
+        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
       } break;
 
       case D3D9Format::X1R5G5B5:

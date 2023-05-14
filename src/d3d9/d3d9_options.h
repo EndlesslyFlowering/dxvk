@@ -1,5 +1,7 @@
 #pragma once
 
+#include <d3d9.h>
+
 #include "../util/config/config.h"
 #include "../dxvk/dxvk_device.h"
 
@@ -143,29 +145,38 @@ namespace dxvk {
     /// Don't use non seamless cube maps
     bool seamlessCubes;
 
-    /// Upgrades 8 bit RTs to 16 bit
-    bool upgrade8bitRenderTargets;
+    /// upgrades render targets
+    bool upgradeRenderTargets;
 
-    /// Upgrades 10 bit RTs to 16 bit
-    bool upgrade10bitRenderTargets;
+    D3DFORMAT upgrade_A8B8G8R8_to;
+    D3DFORMAT upgrade_X8B8G8R8_to;
+    D3DFORMAT upgrade_A8R8G8B8_to;
+    D3DFORMAT upgrade_X8R8G8B8_to;
+    D3DFORMAT upgrade_A2B10G10R10_to;
+    D3DFORMAT upgrade_A2R10G10B10_to;
 
-    /// log render target upgrade
-    bool logRenderTargetUpgrades;
+    /// log formats used
+    bool logFormatsUsed;
 
-    /// Upgrade output format to 10 bit
+    /// upgrade output format
     bool upgradeOutputFormat;
 
     /// Upgrade output format in the virtual D3D9 swapchain
     /// may or may not cause issues
-    bool upgradeOutputFormatEarly;
+    bool upgradeOutputFormatInternal;
+
+    /// which output format to upgrade to
+    VkFormat upgradeOutputFormatTo;
+
+    /// which internal output format upgrade to
+    D3DFORMAT upgradeOutputFormatInternalTo;
+
+    /// output color space to upgrade to
+    VkColorSpaceKHR upgradeOutputColorSpaceTo;
 
     // enforce fullscreen exclusive as a possible workaround to output HDR
     // as it only works in FSE under Windows
-    bool enforceFullscreenExclusive;
-
-    /// Upgrade 8 and 10 bit output formats to use PQ as color space.
-    /// for compatability reasons only works for 8 bit output formats if 'upgradeOutputFormat' is enabled too
-    bool upgradeOutputColorSpaceToPQ;
+    bool enforceFullscreenExclusiveInternally;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;

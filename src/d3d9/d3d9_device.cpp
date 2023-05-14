@@ -7358,9 +7358,9 @@ namespace dxvk {
 
 
   HRESULT D3D9DeviceEx::ResetSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX* pFullscreenDisplayMode) {
-    if (m_d3d9Options.upgradeOutputFormatEarly)
-      pPresentationParameters->BackBufferFormat = D3DFMT_A16B16G16R16F;
-    if (m_d3d9Options.enforceFullscreenExclusive)
+    if (m_d3d9Options.upgradeOutputFormatInternal)
+      pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeOutputFormatInternalTo;
+    if (m_d3d9Options.enforceFullscreenExclusiveInternally)
       pPresentationParameters->Windowed = FALSE;
     D3D9Format backBufferFmt = EnumerateFormat(pPresentationParameters->BackBufferFormat);
 
