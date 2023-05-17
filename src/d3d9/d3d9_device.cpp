@@ -7360,10 +7360,8 @@ namespace dxvk {
   HRESULT D3D9DeviceEx::ResetSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX* pFullscreenDisplayMode) {
     if (m_d3d9Options.upgradeOutputFormatInternal)
       pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeOutputFormatInternalTo;
-    if (m_d3d9Options.enforceWindowModeInternally == "windowed")
-      pPresentationParameters->Windowed = TRUE;
-    else if (m_d3d9Options.enforceWindowModeInternally == "fullscreen")
-      pPresentationParameters->Windowed = FALSE;
+    if (m_d3d9Options.enforceWindowModeInternally)
+      pPresentationParameters->Windowed = m_d3d9Options.enforcedWindowModeInternally;
     D3D9Format backBufferFmt = EnumerateFormat(pPresentationParameters->BackBufferFormat);
 
     Logger::info(str::format(

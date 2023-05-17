@@ -148,22 +148,15 @@ namespace dxvk {
     /// upgrades render targets
     bool upgradeRenderTargets;
 
-    D3DFORMAT upgrade_A8B8G8R8_to;
-    D3DFORMAT upgrade_X8B8G8R8_to;
-    D3DFORMAT upgrade_A8R8G8B8_to;
-    D3DFORMAT upgrade_X8R8G8B8_to;
-    D3DFORMAT upgrade_A2B10G10R10_to;
-    D3DFORMAT upgrade_A2R10G10B10_to;
+    /// enable upgrade swapchain
+    bool enableSwapchainUpgrade;
+
+    /// Upgrade output format in the virtual D3D9 swapchain
+    /// may or may not cause issues. Basically cosmetics ;)
+    bool upgradeOutputFormatInternal;
 
     /// log formats used
     bool logFormatsUsed;
-
-    /// upgrade output format
-    bool upgradeOutputFormat;
-
-    /// Upgrade output format in the virtual D3D9 swapchain
-    /// may or may not cause issues
-    bool upgradeOutputFormatInternal;
 
     /// which output format to upgrade to
     VkFormat upgradeOutputFormatTo;
@@ -174,9 +167,17 @@ namespace dxvk {
     /// output color space to upgrade to
     VkColorSpaceKHR upgradeOutputColorSpaceTo;
 
+    D3DFORMAT upgradeRT_RGBA8_to;
+    D3DFORMAT upgradeRT_RGBX8_to;
+    D3DFORMAT upgradeRT_BGRA8_to;
+    D3DFORMAT upgradeRT_BGRX8_to;
+    D3DFORMAT upgradeRT_RGB10A2_to;
+    D3DFORMAT upgradeRT_BGR10A2_to;
+
     /// enfore fullscreen exclusive or windowed mode
     /// for the internal swapchain
-    std::string enforceWindowModeInternally;
+    bool enforceWindowModeInternally;
+    WINBOOL enforcedWindowModeInternally;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;

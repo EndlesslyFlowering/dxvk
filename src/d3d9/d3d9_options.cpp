@@ -5,7 +5,7 @@
 namespace dxvk {
 
   D3DFORMAT D3DFMT_UpgradeHelper(const std::string str) {
-    if (str == "false")
+    if (str == "disabled")
       return D3DFMT_UNKNOWN;
     else if (str == "rgba16")
       return D3DFMT_A16B16G16R16;
@@ -18,7 +18,7 @@ namespace dxvk {
   }
 
   VkFormat VkFormat_UpgradeHelper(const std::string str) {
-    if (str == "false")
+    if (str == "disabled")
       return VK_FORMAT_UNDEFINED;
     else if (str == "rgba16")
       return VK_FORMAT_R16G16B16A16_UNORM;
@@ -28,6 +28,13 @@ namespace dxvk {
       return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
     else
       return VK_FORMAT_R16G16B16A16_SFLOAT;
+  }
+
+  WINBOOL D3D9_WindowModeHelper(const std::string str) {
+    if (str == "windowed")
+      return TRUE;
+    else
+      return FALSE;
   }
 
   static int32_t parsePciId(const std::string& str) {
@@ -102,9 +109,8 @@ namespace dxvk {
     this->deviceLost                    = config.getOption<bool>        ("d3d9.deviceLost",                    false);
 
     this->upgradeRenderTargets                 = config.getOption<bool>        ("d3d9.upgradeRenderTargets",          false);
-    this->upgradeOutputFormat                  = config.getOption<bool>        ("d3d9.upgradeOutputFormat",           false);
+    this->enableSwapchainUpgrade               = config.getOption<bool>        ("d3d9.enableSwapchainUpgrade",        false);
     this->upgradeOutputFormatInternal          = config.getOption<bool>        ("d3d9.upgradeOutputFormatInternal",   false);
-    this->enforceWindowModeInternally          = config.getOption<std::string> ("d3d9.enforceWindowModeInternally",   "");
     this->logFormatsUsed                       = config.getOption<bool>        ("d3d9.logFormatsUsed",                false);
 
 
@@ -113,30 +119,41 @@ namespace dxvk {
     this->upgradeOutputFormatInternalTo =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeOutputFormatInternalTo", "rgba16f")));
 
-    std::string strUpgradeOutputColorSpaceTo = Config::toLower(config.getOption<std::string>("d3d9.upgradeOutputColorSpaceTo", "scRGB"));
-    if (strUpgradeOutputColorSpaceTo == "pq")
+    std::string strUpgradeOutputColorSpaceTo =
+      Config::toLower(config.getOption<std::string>("d3d9.upgradeOutputColorSpaceTo", "scRGB"));
+    if (strUpgradeOutputColorSpaceTo == "disabled")
+      this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    else if (strUpgradeOutputColorSpaceTo == "bt709_non_linear")
+      this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
+    else if (strUpgradeOutputColorSpaceTo == "pq")
       this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_HDR10_ST2084_EXT;
     else if (strUpgradeOutputColorSpaceTo == "bt2020_linear")
       this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_BT2020_LINEAR_EXT;
-    else if (strUpgradeOutputColorSpaceTo == "bt709_non_linear")
-      this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
-    else if (strUpgradeOutputColorSpaceTo == "srgb")
-      this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     else
       this->upgradeOutputColorSpaceTo = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
 
-    this->upgrade_A8B8G8R8_to =
+    this->upgradeRT_RGBA8_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_RGBA8_to",   "rgba16f")));
-    this->upgrade_X8B8G8R8_to =
+    this->upgradeRT_RGBX8_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_RGBX8_to",   "rgba16f")));
-    this->upgrade_A8R8G8B8_to =
+    this->upgradeRT_BGRA8_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_BGRA8_to",   "rgba16f")));
-    this->upgrade_X8R8G8B8_to =
+    this->upgradeRT_BGRX8_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_BGRX8_to",   "rgba16f")));
-    this->upgrade_A2B10G10R10_to =
+    this->upgradeRT_RGB10A2_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_RGB10A2_to", "rgba16f")));
-    this->upgrade_A2R10G10B10_to =
+    this->upgradeRT_BGR10A2_to =
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeRT_BGR10A2_to", "rgba16f")));
+
+
+    std::string strEnforceWindowModeInternally =
+      Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
+    if (strEnforceWindowModeInternally == "windowed" || strEnforceWindowModeInternally == "fullscreen")
+      this->enforceWindowModeInternally = true;
+    else
+      this->enforceWindowModeInternally = false;
+    this->enforcedWindowModeInternally = D3D9_WindowModeHelper(strEnforceWindowModeInternally);
+
 
     std::string floatEmulation = Config::toLower(config.getOption<std::string>("d3d9.floatEmulation", "auto"));
     if (floatEmulation == "strict") {

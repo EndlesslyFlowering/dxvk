@@ -60,48 +60,48 @@ namespace dxvk {
     }
     if (m_device->GetOptions()->upgradeRenderTargets && (m_desc.Usage & D3DUSAGE_RENDERTARGET))
     {
-      D3D9Format ug_RGBA8_to   = D3D9Format(m_device->GetOptions()->upgrade_A8B8G8R8_to);
-      D3D9Format ug_RGBX8_to   = D3D9Format(m_device->GetOptions()->upgrade_X8B8G8R8_to);
-      D3D9Format ug_BGRA8_to   = D3D9Format(m_device->GetOptions()->upgrade_A8R8G8B8_to);
-      D3D9Format ug_BGRX8_to   = D3D9Format(m_device->GetOptions()->upgrade_X8R8G8B8_to);
-      D3D9Format ug_RGB10A2_to = D3D9Format(m_device->GetOptions()->upgrade_A2B10G10R10_to);
-      D3D9Format ug_BGR10A2_to = D3D9Format(m_device->GetOptions()->upgrade_A2R10G10B10_to);
+      D3D9Format ugRT_RGBA8_to   = D3D9Format(m_device->GetOptions()->upgradeRT_RGBA8_to);
+      D3D9Format ugRT_RGBX8_to   = D3D9Format(m_device->GetOptions()->upgradeRT_RGBX8_to);
+      D3D9Format ugRT_BGRA8_to   = D3D9Format(m_device->GetOptions()->upgradeRT_BGRA8_to);
+      D3D9Format ugRT_BGRX8_to   = D3D9Format(m_device->GetOptions()->upgradeRT_BGRX8_to);
+      D3D9Format ugRT_RGB10A2_to = D3D9Format(m_device->GetOptions()->upgradeRT_RGB10A2_to);
+      D3D9Format ugRT_BGR10A2_to = D3D9Format(m_device->GetOptions()->upgradeRT_BGR10A2_to);
 
       if (m_desc.Format == D3D9Format::A8B8G8R8
-       && ug_RGBA8_to   != D3D9Format::Unknown)
+       && ugRT_RGBA8_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_RGBA8_to);
-        RtUpgradeLogger(m_desc.Format, ug_RGBA8_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_RGBA8_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_RGBA8_to);
       }
       else if (m_desc.Format == D3D9Format::X8B8G8R8
-            && ug_RGBX8_to   != D3D9Format::Unknown)
+            && ugRT_RGBX8_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_RGBX8_to);
-        RtUpgradeLogger(m_desc.Format, ug_RGBX8_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_RGBX8_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_RGBX8_to);
       }
       else if (m_desc.Format == D3D9Format::A8R8G8B8
-            && ug_BGRA8_to   != D3D9Format::Unknown)
+            && ugRT_BGRA8_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_BGRA8_to);
-        RtUpgradeLogger(m_desc.Format, ug_BGRA8_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_BGRA8_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_BGRA8_to);
       }
       else if (m_desc.Format == D3D9Format::X8R8G8B8
-            && ug_BGRX8_to   != D3D9Format::Unknown)
+            && ugRT_BGRX8_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_BGRX8_to);
-        RtUpgradeLogger(m_desc.Format, ug_BGRX8_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_BGRX8_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_BGRX8_to);
       }
-      else if (m_desc.Format == D3D9Format::A2B10G10R10
-            && ug_RGB10A2_to != D3D9Format::Unknown)
+      else if (m_desc.Format   == D3D9Format::A2B10G10R10
+            && ugRT_RGB10A2_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_RGB10A2_to);
-        RtUpgradeLogger(m_desc.Format, ug_RGB10A2_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_RGB10A2_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_RGB10A2_to);
       }
-      else if (m_desc.Format == D3D9Format::A2R10G10B10
-            && ug_BGR10A2_to != D3D9Format::Unknown)
+      else if (m_desc.Format   == D3D9Format::A2R10G10B10
+            && ugRT_BGR10A2_to != D3D9Format::Unknown)
       {
-        m_mapping = ConvertFormatUnfixed(ug_BGR10A2_to);
-        RtUpgradeLogger(m_desc.Format, ug_BGR10A2_to);
+        m_mapping = ConvertFormatUnfixed(ugRT_BGR10A2_to);
+        RtUpgradeLogger(m_desc.Format, ugRT_BGR10A2_to);
       }
       else
       {

@@ -1077,20 +1077,20 @@ namespace dxvk {
           VkSurfaceFormatKHR*       pDstFormats) {
     uint32_t n = 0;
 
-    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeOutputColorSpaceTo;
     VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeOutputFormatTo;
+    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeOutputColorSpaceTo;
 
     switch (Format) {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));      
      [[fallthrough]];
 
-      // mappings are based on the format + color space the current AMD Windows driver supports
+      // mappings are based on the format + color space combos the current AMD Windows driver supports
       case D3D9Format::A8R8G8B8:
       case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
       case D3D9Format::X8B8G8R8: {
-        if (m_parent->GetOptions()->upgradeOutputFormat) {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
           if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
@@ -1114,7 +1114,7 @@ namespace dxvk {
 
       case D3D9Format::A2R10G10B10:
       case D3D9Format::A2B10G10R10: {
-        if (m_parent->GetOptions()->upgradeOutputFormat) {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
           if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
@@ -1134,7 +1134,7 @@ namespace dxvk {
       } break;
 
       case D3D9Format::A16B16G16R16: {
-        if (m_parent->GetOptions()->upgradeOutputFormat) {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
           if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
           }
@@ -1147,7 +1147,7 @@ namespace dxvk {
       } break;
 
       case D3D9Format::A16B16G16R16F: {
-        if (m_parent->GetOptions()->upgradeOutputFormat) {
+        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
           if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
             pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
           }
