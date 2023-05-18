@@ -1077,8 +1077,8 @@ namespace dxvk {
           VkSurfaceFormatKHR*       pDstFormats) {
     uint32_t n = 0;
 
-    VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeOutputFormatTo;
-    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeOutputColorSpaceTo;
+    VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeSwapchainFormatTo;
+    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeSwapchainColorSpaceTo;
 
     switch (Format) {
       default:

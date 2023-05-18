@@ -259,8 +259,8 @@ namespace dxvk {
           DWORD                  BehaviorFlags,
           D3DPRESENT_PARAMETERS* pPresentationParameters,
           IDirect3DDevice9**     ppReturnedDeviceInterface) {
-    if (m_d3d9Options.upgradeOutputFormatInternal)
-      pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeOutputFormatInternalTo;
+    if (m_d3d9Options.enableSwapchainFormatUpgradeInternal)
+      pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeSwapchainFormatInternalTo;
     if (m_d3d9Options.enforceWindowModeInternally)
       pPresentationParameters->Windowed = m_d3d9Options.enforcedWindowModeInternally;
     return this->CreateDeviceEx(

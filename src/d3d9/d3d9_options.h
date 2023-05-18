@@ -146,33 +146,38 @@ namespace dxvk {
     bool seamlessCubes;
 
     /// upgrades render targets
-    bool upgradeRenderTargets;
+    bool enableRenderTargetUpgrade;
+
+    /// upgrade specific render target formats
+    D3DFORMAT upgrade_RGBA8_renderTargetTo;
+    D3DFORMAT upgrade_RGBX8_renderTargetTo;
+    D3DFORMAT upgrade_BGRA8_renderTargetTo;
+    D3DFORMAT upgrade_BGRX8_renderTargetTo;
+    D3DFORMAT upgrade_RGB10A2_renderTargetTo;
+    D3DFORMAT upgrade_BGR10A2_renderTargetTo;
+    D3DFORMAT upgrade_RGBA16_renderTargetTo;
 
     /// enable upgrade swapchain
     bool enableSwapchainUpgrade;
 
+    /// which output format to upgrade to
+    VkFormat upgradeSwapchainFormatTo;
+
+    /// output color space to upgrade to
+    VkColorSpaceKHR upgradeSwapchainColorSpaceTo;
+
     /// Upgrade output format in the virtual D3D9 swapchain
     /// may or may not cause issues. Basically cosmetics ;)
-    bool upgradeOutputFormatInternal;
+    bool enableSwapchainFormatUpgradeInternal;
+
+    /// which internal output format upgrade to
+    D3DFORMAT upgradeSwapchainFormatInternalTo;
+
+    /// log formats used
+    bool logRenderTargetFormatsUsed;
 
     /// log formats used
     bool logFormatsUsed;
-
-    /// which output format to upgrade to
-    VkFormat upgradeOutputFormatTo;
-
-    /// which internal output format upgrade to
-    D3DFORMAT upgradeOutputFormatInternalTo;
-
-    /// output color space to upgrade to
-    VkColorSpaceKHR upgradeOutputColorSpaceTo;
-
-    D3DFORMAT upgradeRT_RGBA8_to;
-    D3DFORMAT upgradeRT_RGBX8_to;
-    D3DFORMAT upgradeRT_BGRA8_to;
-    D3DFORMAT upgradeRT_BGRX8_to;
-    D3DFORMAT upgradeRT_RGB10A2_to;
-    D3DFORMAT upgradeRT_BGR10A2_to;
 
     /// enfore fullscreen exclusive or windowed mode
     /// for the internal swapchain
