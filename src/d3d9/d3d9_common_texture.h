@@ -484,6 +484,8 @@ namespace dxvk {
 
     ID3D9VkInteropTexture* GetVkInterop() { return &m_d3d9Interop; }
 
+    static bool forceDisableUpgrade;
+
   private:
 
     void RtUpgradeLogger(

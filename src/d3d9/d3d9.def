@@ -25,3 +25,6 @@ EXPORTS
   DXVK_UnRegisterAnnotation @28258 NONAME
 
   Direct3D9ForceHybridEnumeration @16 NONAME PRIVATE
+
+  DXVK_HDR_DisableFormatUpgrade @28259
+  DXVK_HDR_EnableFormatUpgrade @28260
