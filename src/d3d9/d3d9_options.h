@@ -183,7 +183,12 @@ namespace dxvk {
     /// enfore fullscreen exclusive or windowed mode
     /// for the internal swapchain
     bool enforceWindowModeInternally;
-    WINBOOL enforcedWindowModeInternally;
+#if defined(_MSC_VER)
+    BOOL
+#else
+    WINBOOL
+#endif
+            enforcedWindowModeInternally;
 
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;
