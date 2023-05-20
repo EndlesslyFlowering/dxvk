@@ -6111,6 +6111,9 @@ namespace dxvk {
       if (m_d3d9Options.clampNegativeLodBias)
         info.mipmapLodBias = std::max(info.mipmapLodBias, 0.0f);
 
+      if (m_d3d9Options.logLodBias)
+        Logger::info(str::format("old lod bias: ", cKey.MipmapLodBias, " new: ", info.mipmapLodBias));
+
       info.mipmapLodMin   = mipFilter.MipsEnabled ? float(cKey.MaxMipLevel) : 0;
       info.mipmapLodMax   = mipFilter.MipsEnabled ? FLT_MAX                 : 0;
       info.reductionMode  = VK_SAMPLER_REDUCTION_MODE_WEIGHTED_AVERAGE;

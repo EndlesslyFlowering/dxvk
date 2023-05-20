@@ -151,6 +151,9 @@ namespace dxvk {
     /// Clamps negative LOD bias
     bool clampNegativeLodBias;
 
+    /// log the current and applied lod lod bias
+    bool logLodBias;
+
     /// How much virtual memory will be used for textures (in MB).
     int32_t textureMemory;
 
