@@ -6,7 +6,9 @@
 
 namespace dxvk {
 
-  D3DFORMAT D3DFMT_UpgradeHelper(const std::string str) {
+  //HDR-mod helpers start
+  D3DFORMAT D3DFMT_UpgradeHelper(const std::string str)
+  {
     if (str == "disabled")
       return D3DFMT_UNKNOWN;
     else if (str == "rgb10a2")
@@ -21,7 +23,8 @@ namespace dxvk {
       return D3DFMT_A16B16G16R16F;
   }
 
-  D3DFORMAT D3DFMT_RGBA16_UpgradeHelper(const std::string str) {
+  D3DFORMAT D3DFMT_RGBA16_UpgradeHelper(const std::string str)
+  {
     if (str == "disabled")
       return D3DFMT_UNKNOWN;
     else if (str == "rgba32f")
@@ -30,7 +33,8 @@ namespace dxvk {
       return D3DFMT_A16B16G16R16F;
   }
 
-  VkFormat VkFormat_UpgradeHelper(const std::string str) {
+  VkFormat VkFormat_UpgradeHelper(const std::string str)
+  {
     if (str == "disabled")
       return VK_FORMAT_UNDEFINED;
     else if (str == "rgb10a2")
@@ -43,12 +47,19 @@ namespace dxvk {
       return VK_FORMAT_R16G16B16A16_SFLOAT;
   }
 
-  WINBOOL D3D9_WindowModeHelper(const std::string str) {
+#if defined(_MSC_VER)
+  BOOL
+#else
+  WINBOOL
+#endif
+          D3D9_WindowModeHelper(const std::string str)
+  {
     if (str == "windowed")
       return TRUE;
     else
       return FALSE;
   }
+  //HDR-mod helpers end
 
   static int32_t parsePciId(const std::string& str) {
     if (str.size() != 4)
