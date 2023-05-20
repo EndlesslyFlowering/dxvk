@@ -48,7 +48,12 @@ namespace dxvk {
     
     // Enforce LOD bias specified in the device options
     if (info.minFilter == VK_FILTER_LINEAR && info.magFilter == VK_FILTER_LINEAR)
+    {
       info.mipmapLodBias += device->GetOptions()->samplerLodBias;
+
+      if (device->GetOptions()->clampNegativeLodBias)
+        info.mipmapLodBias = std::max(info.mipmapLodBias, 0.0f);
+    }
 
     // Enforce anisotropy specified in the device options
     int32_t samplerAnisotropyOption = device->GetOptions()->samplerAnisotropy;
