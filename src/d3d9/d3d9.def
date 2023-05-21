@@ -29,5 +29,5 @@ EXPORTS
   Direct3DCreate9On12 @20
   Direct3DCreate9On12Ex @21
 
-  DXVK_HDR_DisableFormatUpgrade @28259
-  DXVK_HDR_EnableFormatUpgrade @28260
+  DXVK_D3D9_HDR_DisableRenderTargetUpgrade @28259
+  DXVK_D3D9_HDR_EnableRenderTargetUpgrade @28260
