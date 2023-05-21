@@ -101,13 +101,13 @@ extern "C" {
   DLLEXPORT void __stdcall Direct3D9ForceHybridEnumeration(UINT uHybrid) {
   }
 
-  DLLEXPORT bool __stdcall DXVK_HDR_DisableFormatUpgrade() {
-      dxvk::D3D9CommonTexture::forceDisableUpgrade = true;
+  DLLEXPORT bool __stdcall DXVK_D3D9_HDR_DisableRenderTargetUpgrade() {
+      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrade = true;
       return true;
   }
 
-  DLLEXPORT bool __stdcall DXVK_HDR_EnableFormatUpgrade() {
-      dxvk::D3D9CommonTexture::forceDisableUpgrade = false;
+  DLLEXPORT bool __stdcall DXVK_D3D9_HDR_EnableRenderTargetUpgrade() {
+      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrade = false;
       return true;
   }
 
