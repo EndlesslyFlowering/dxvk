@@ -10,7 +10,7 @@
 
 namespace dxvk {
 
-  bool D3D9CommonTexture::forceDisableUpgrade = false;
+  bool D3D9CommonTexture::forceDisableRenderTargetUpgrade = false;
 
   void D3D9CommonTexture::RtUpgradeLogger(
           D3D9Format originalFormat,
@@ -58,7 +58,7 @@ namespace dxvk {
     if (IsPoolManaged(m_desc.Pool)) {
       SetAllNeedUpload();
     }
-    if (m_device->GetOptions()->enableRenderTargetUpgrade && (m_desc.Usage & D3DUSAGE_RENDERTARGET) && !forceDisableUpgrade)
+    if (m_device->GetOptions()->enableRenderTargetUpgrade && (m_desc.Usage & D3DUSAGE_RENDERTARGET) && !forceDisableRenderTargetUpgrade)
     {
       D3D9Format ugRT_RGBA8_to   = D3D9Format(m_device->GetOptions()->upgrade_RGBA8_renderTargetTo);
       D3D9Format ugRT_RGBX8_to   = D3D9Format(m_device->GetOptions()->upgrade_RGBX8_renderTargetTo);
