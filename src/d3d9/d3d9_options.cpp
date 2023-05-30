@@ -5,44 +5,70 @@
 namespace dxvk {
 
   //HDR-mod helpers start
-  D3DFORMAT D3DFMT_UpgradeHelper(const std::string str)
+  D3DFORMAT D3DFMT_UpgradeHelper(
+    const std::string format,
+    const D3DFORMAT   originalFormat,
+    const bool        isSwapchainFormat)
   {
-    if (str == "disabled")
-      return D3DFMT_UNKNOWN;
-    else if (str == "rgb10a2")
-      return D3DFMT_A2B10G10R10;
-    else if (str == "bgr10a2")
-      return D3DFMT_A2R10G10B10;
-    else if (str == "rgba16")
-      return D3DFMT_A16B16G16R16;
-    else if (str == "rgba32f")
+    if (format == "disabled") {
+      return originalFormat;
+    }
+    else if (originalFormat != D3DFMT_A16B16G16R16)
+    {
+      if (format == "rgb10a2") {
+        return D3DFMT_A2B10G10R10;
+      }
+      else if (format == "bgr10a2") {
+        return D3DFMT_A2R10G10B10;
+      }
+      else if (format == "rgba16") {
+        return D3DFMT_A16B16G16R16;
+      }
+    }
+    else if (format == "rgba32f" && !isSwapchainFormat) {
       return D3DFMT_A32B32G32R32F;
-    else
+    }
+    else {
       return D3DFMT_A16B16G16R16F;
+    }
   }
 
-  D3DFORMAT D3DFMT_RGBA16_UpgradeHelper(const std::string str)
+  VkFormat VkFormat_UpgradeHelper(const std::string format)
   {
-    if (str == "disabled")
-      return D3DFMT_UNKNOWN;
-    else if (str == "rgba32f")
-      return D3DFMT_A32B32G32R32F;
-    else
-      return D3DFMT_A16B16G16R16F;
-  }
-
-  VkFormat VkFormat_UpgradeHelper(const std::string str)
-  {
-    if (str == "disabled")
+    if (format == "disabled") {
       return VK_FORMAT_UNDEFINED;
-    else if (str == "rgb10a2")
+    }
+    else if (format == "rgb10a2") {
       return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
-    else if (str == "bgr10a2")
+    }
+    else if (format == "bgr10a2") {
       return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
-    else if (str == "rgba16")
+    }
+    else if (format == "rgba16") {
       return VK_FORMAT_R16G16B16A16_UNORM;
-    else
+    }
+    else {
       return VK_FORMAT_R16G16B16A16_SFLOAT;
+    }
+  }
+
+  VkColorSpaceKHR VkColorSpace_UpgradeHelper(const std::string colorSpace)
+  {
+    if (colorSpace == "disabled") {
+      return VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    }
+    else if (colorSpace == "bt709_non_linear") {
+      return VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
+    }
+    else if (colorSpace == "pq") {
+      return VK_COLOR_SPACE_HDR10_ST2084_EXT;
+    }
+    else if (colorSpace == "bt2020_linear") {
+      return VK_COLOR_SPACE_BT2020_LINEAR_EXT;
+    }
+    else {
+      return VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+    }
   }
 
 #if defined(_MSC_VER)
@@ -50,9 +76,9 @@ namespace dxvk {
 #else
   WINBOOL
 #endif
-          D3D9_WindowModeHelper(const std::string str)
+          D3D9_WindowModeHelper(const std::string windowMode)
   {
-    if (str == "windowed")
+    if (windowMode == "windowed")
       return TRUE;
     else
       return FALSE;
@@ -140,43 +166,60 @@ namespace dxvk {
 
     this->upgradeSwapchainFormatTo =
       VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatTo", "rgba16f")));
-    this->upgradeSwapchainFormatInternalTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatInternalTo", "rgba16f")));
+    this->upgradeSwapchainColorSpaceTo =
+      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainColorSpaceTo", "scRGB")));
+    if (this->upgradeSwapchainFormatTo     == VK_FORMAT_UNDEFINED
+     || this->upgradeSwapchainColorSpaceTo == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      this->enableSwapchainUpgrade = false;
+    }
 
-    std::string strUpgradeSwapchainColorSpaceTo =
-      Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainColorSpaceTo", "scRGB"));
-    if (strUpgradeSwapchainColorSpaceTo == "disabled")
-      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-    else if (strUpgradeSwapchainColorSpaceTo == "bt709_non_linear")
-      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
-    else if (strUpgradeSwapchainColorSpaceTo == "pq")
-      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_HDR10_ST2084_EXT;
-    else if (strUpgradeSwapchainColorSpaceTo == "bt2020_linear")
-      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_BT2020_LINEAR_EXT;
-    else
-      this->upgradeSwapchainColorSpaceTo = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+
+    this->upgradeSwapchainFormatInternalTo =
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatInternalTo", "rgba16f")),
+                           D3DFMT_UNKNOWN,
+                           true);
+    if (this->upgradeSwapchainFormatInternalTo == D3DFMT_UNKNOWN) {
+      this->enableSwapchainFormatUpgradeInternal = false;
+    }
 
     this->upgrade_RGBA8_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA8_renderTargetTo",   "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA8_renderTargetTo", "rgba16f")),
+                           D3DFMT_A8B8G8R8,
+                           false);
     this->upgrade_RGBX8_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBX8_renderTargetTo",   "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBX8_renderTargetTo", "rgba16f")),
+                           D3DFMT_X8B8G8R8,
+                           false);
     this->upgrade_BGRA8_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRA8_renderTargetTo",   "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRA8_renderTargetTo", "rgba16f")),
+                           D3DFMT_A8R8G8B8,
+                           false);
     this->upgrade_BGRX8_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRX8_renderTargetTo",   "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGRX8_renderTargetTo", "rgba16f")),
+                           D3DFMT_X8R8G8B8,
+                           false);
     this->upgrade_RGB10A2_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGB10A2_renderTargetTo", "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGB10A2_renderTargetTo", "rgba16f")),
+                           D3DFMT_A2B10G10R10,
+                           false);
     this->upgrade_BGR10A2_renderTargetTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGR10A2_renderTargetTo", "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_BGR10A2_renderTargetTo", "rgba16f")),
+                           D3DFMT_A2R10G10B10,
+                           false);
     this->upgrade_RGBA16_renderTargetTo = /*default to rgba16f for memory budget reasons*/
-      D3DFMT_RGBA16_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA16_renderTargetTo", "rgba16f")));
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA16_renderTargetTo", "rgba16f")),
+                           D3DFMT_A16B16G16R16,
+                           false);
 
     std::string strEnforceWindowModeInternally =
       Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
-    if (strEnforceWindowModeInternally == "windowed" || strEnforceWindowModeInternally == "fullscreen")
+    if (strEnforceWindowModeInternally == "windowed"
+     || strEnforceWindowModeInternally == "fullscreen") {
       this->enforceWindowModeInternally = true;
-    else
+    }
+    else {
       this->enforceWindowModeInternally = false;
+    }
     this->enforcedWindowModeInternally = D3D9_WindowModeHelper(strEnforceWindowModeInternally);
     //HDR-mod end
 
