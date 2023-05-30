@@ -125,6 +125,11 @@ namespace dxvk {
             RT_UPGRADE_HELPER(RGBA16)
           }
           [[fallthrough]];
+          case D3D9Format::A16B16G16R16F: // RGBA16F
+          {
+            RT_UPGRADE_HELPER(RGBA16F)
+          }
+          [[fallthrough]];
           default:
           {
             DEFAULT_FORMAT_MAPPING(true)
