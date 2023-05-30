@@ -12,22 +12,35 @@ namespace dxvk {
 
   bool D3D9CommonTexture::forceDisableRenderTargetUpgrade = false;
 
-  void D3D9CommonTexture::RtUpgradeLogger(
-          D3D9Format originalFormat,
-          D3D9Format upgradedFormat)
-  {
-    if (m_device->GetOptions()->logRenderTargetFormatsUsed)
-      Logger::info(str::format("D3D9: render target upgrade:     ", originalFormat, " -> ", upgradedFormat));
-  }
-
   void D3D9CommonTexture::FormatLogger(
-          D3D9Format Format,
-          bool       isRt)
+          D3D9Format* Format,
+          bool        isRt)
   {
     if (m_device->GetOptions()->logRenderTargetFormatsUsed && isRt)
+    {
       Logger::info(str::format("D3D9: used render target format: ", Format));
+    }
     else if (m_device->GetOptions()->logFormatsUsed)
+    {
       Logger::info(str::format("D3D9: used D3D9 format:          ", Format));
+    }
+  }
+
+  void D3D9CommonTexture::RtUpgradeLogger(
+          D3D9Format* originalFormat,
+    const D3D9Format* upgradedFormat)
+  {
+    if (*originalFormat == *upgradedFormat)
+    {
+      FormatLogger(originalFormat, true);
+    }
+    else if (m_device->GetOptions()->logRenderTargetFormatsUsed)
+    {
+      Logger::info(str::format("D3D9: render target upgrade:     ",
+                               *originalFormat,
+                               " -> ",
+                               *upgradedFormat));
+    }
   }
 
   D3D9CommonTexture::D3D9CommonTexture(
@@ -58,73 +71,80 @@ namespace dxvk {
     if (IsPoolManaged(m_desc.Pool)) {
       SetAllNeedUpload();
     }
-    if (m_device->GetOptions()->enableRenderTargetUpgrade && (m_desc.Usage & D3DUSAGE_RENDERTARGET) && !forceDisableRenderTargetUpgrade)
-    {
-      D3D9Format ugRT_RGBA8_to   = D3D9Format(m_device->GetOptions()->upgrade_RGBA8_renderTargetTo);
-      D3D9Format ugRT_RGBX8_to   = D3D9Format(m_device->GetOptions()->upgrade_RGBX8_renderTargetTo);
-      D3D9Format ugRT_BGRA8_to   = D3D9Format(m_device->GetOptions()->upgrade_BGRA8_renderTargetTo);
-      D3D9Format ugRT_BGRX8_to   = D3D9Format(m_device->GetOptions()->upgrade_BGRX8_renderTargetTo);
-      D3D9Format ugRT_RGB10A2_to = D3D9Format(m_device->GetOptions()->upgrade_RGB10A2_renderTargetTo);
-      D3D9Format ugRT_BGR10A2_to = D3D9Format(m_device->GetOptions()->upgrade_BGR10A2_renderTargetTo);
-      D3D9Format ugRT_RGBA16_to  = D3D9Format(m_device->GetOptions()->upgrade_RGBA16_renderTargetTo);
 
-      if (ugRT_RGBA8_to != D3D9Format::Unknown
-       && m_desc.Format == D3D9Format::A8B8G8R8)
+
+#define RT_UPGRADE_HELPER(format)                          \
+          m_mapping = ConvertFormatUnfixed(ugRtTo.format); \
+          RtUpgradeLogger(&m_desc.Format, &ugRtTo.format); \
+          break;
+
+#define DEFAULT_FORMAT_MAPPING(isRt)                        \
+          m_mapping = pDevice->LookupFormat(m_desc.Format); \
+          FormatLogger(&m_desc.Format, isRt);
+
+
+    if (m_desc.Usage & D3DUSAGE_RENDERTARGET)
+    {
+      if (m_device->GetOptions()->enableRenderTargetUpgrade
+       && !forceDisableRenderTargetUpgrade)
       {
-        m_mapping = ConvertFormatUnfixed(ugRT_RGBA8_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_RGBA8_to);
-      }
-      else if (ugRT_RGBX8_to != D3D9Format::Unknown
-            && m_desc.Format == D3D9Format::X8B8G8R8)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_RGBX8_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_RGBX8_to);
-      }
-      else if (ugRT_BGRA8_to != D3D9Format::Unknown
-            && m_desc.Format == D3D9Format::A8R8G8B8)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_BGRA8_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_BGRA8_to);
-      }
-      else if (ugRT_BGRX8_to != D3D9Format::Unknown
-            && m_desc.Format == D3D9Format::X8R8G8B8)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_BGRX8_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_BGRX8_to);
-      }
-      else if (ugRT_RGB10A2_to != D3D9Format::Unknown
-            && m_desc.Format   == D3D9Format::A2B10G10R10)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_RGB10A2_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_RGB10A2_to);
-      }
-      else if (ugRT_BGR10A2_to != D3D9Format::Unknown
-            && m_desc.Format   == D3D9Format::A2R10G10B10)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_BGR10A2_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_BGR10A2_to);
-      }
-      else if (ugRT_RGBA16_to != D3D9Format::Unknown
-            && m_desc.Format  == D3D9Format::A16B16G16R16)
-      {
-        m_mapping = ConvertFormatUnfixed(ugRT_RGBA16_to);
-        RtUpgradeLogger(m_desc.Format, ugRT_RGBA16_to);
+        switch(m_desc.Format)
+        {
+          case D3D9Format::A8B8G8R8: // RGBA8
+          {
+            RT_UPGRADE_HELPER(RGBA8)
+          }
+          [[fallthrough]];
+          case D3D9Format::X8B8G8R8: // RGBX8
+          {
+            RT_UPGRADE_HELPER(RGBX8)
+          }
+          [[fallthrough]];
+          case D3D9Format::A8R8G8B8: // BGRA8
+          {
+            RT_UPGRADE_HELPER(BGRA8)
+          }
+          [[fallthrough]];
+          case D3D9Format::X8R8G8B8: // BGRX8
+          {
+            RT_UPGRADE_HELPER(BGRX8)
+          }
+          [[fallthrough]];
+          case D3D9Format::A2B10G10R10: // RGB10A2
+          {
+            RT_UPGRADE_HELPER(RGB10A2)
+          }
+          [[fallthrough]];
+          case D3D9Format::A2R10G10B10: // BGR10A2
+          {
+            RT_UPGRADE_HELPER(BGR10A2)
+          }
+          [[fallthrough]];
+          case D3D9Format::A16B16G16R16: // RGBA16
+          {
+            RT_UPGRADE_HELPER(RGBA16)
+          }
+          [[fallthrough]];
+          default:
+          {
+            DEFAULT_FORMAT_MAPPING(true)
+            break;
+          }
+        }
       }
       else
       {
-        m_mapping = pDevice->LookupFormat(m_desc.Format);
-        FormatLogger(m_desc.Format, true);
+        DEFAULT_FORMAT_MAPPING(true)
       }
     }
     else {
-      m_mapping = pDevice->LookupFormat(m_desc.Format);
-      if (m_desc.Usage & D3DUSAGE_RENDERTARGET) {
-        FormatLogger(m_desc.Format, true);
-      }
-      else {
-        FormatLogger(m_desc.Format, false);
-      }
+      DEFAULT_FORMAT_MAPPING(false)
     }
+
+
+#undef RT_UPGRADE_HELPER
+#undef DEFAULT_FORMAT_MAPPING
+
 
     m_mapMode        = DetermineMapMode();
     m_shadow         = DetermineShadowState();
