@@ -28,24 +28,25 @@ Default/Fallback: `False`
 
 Individual render target upgrades per format.\
 These may cause visual issues. Check [d3d9.logRenderTargetFormatsUsed](#d3d9logRenderTargetFormatsUsed) to fix those.\
-Watch out for memory usage on 32 bit applications. Using `"rgba32f"` there can cause crashes or the game not loading.
+Watch out for memory usage on 32 bit applications! Using `"rgba32f"` there can cause crashes or the game not loading.
 
-Setting 'd3d9.upgrade_***_renderTargetTo = "rgba16f"' will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
-This needs '[d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo) = "rgba16f"' and '[d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo) = "scRGB"' otherwise they are lost again.
+Setting `d3d9.upgrade_***_renderTargetTo = "rgba16f"` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
+This needs '[d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo) = "rgba16f"' and '[d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo) = "scRGB"' otherwise they are lost again.\
+Additionally further post processing is needed to display the game correctly.
 
 what option corresponds to what format:
 
-| option  | format                 |
-|---------|------------------------|
-| RGBA8   | `D3DFMT_A8B8G8R8`      |
-| RGBX8   | `D3DFMT_X8B8G8R8`      |
-| BGRA8   | `D3DFMT_A8R8G8B8`      |
-| BGRX8   | `D3DFMT_X8R8G8B8`      |
-| RGB10A2 | `D3DFMT_A2B10G10R10`   |
-| BGR10A2 | `D3DFMT_A2R10G10B10`   |
-| RGBA16  | `D3DFMT_A16B16G16R16`  |
-| RGBA16F | `D3DFMT_A16B16G16R16F` |
-| RGBA32F | `D3DFMT_A32B32G32R32F` |
+| option  | format                 | type             | allows 'overbright' extraction |
+|---------|------------------------|------------------|--------------------------------|
+| RGBA8   | `D3DFMT_A8B8G8R8`      | unsigned integer | no                             |
+| RGBX8   | `D3DFMT_X8B8G8R8`      | unsigned integer | no                             |
+| BGRA8   | `D3DFMT_A8R8G8B8`      | unsigned integer | no                             |
+| BGRX8   | `D3DFMT_X8R8G8B8`      | unsigned integer | no                             |
+| RGB10A2 | `D3DFMT_A2B10G10R10`   | unsigned integer | no                             |
+| BGR10A2 | `D3DFMT_A2R10G10B10`   | unsigned integer | no                             |
+| RGBA16  | `D3DFMT_A16B16G16R16`  | unsigned integer | no                             |
+| RGBA16F | `D3DFMT_A16B16G16R16F` | float            | yes                            |
+| RGBA32F | `D3DFMT_A32B32G32R32F` | float            | yes                            |
 
 d3d9.upgrade_RGBA8_renderTargetTo:\
 d3d9.upgrade_RGBX8_renderTargetTo:\
@@ -62,6 +63,12 @@ d3d9.upgrade_RGBA16_renderTargetTo:
 
 Supported values: `"disabled"`, `"rgba16f"`, `"rgba32f"`\
 Default/Fallback: `"rgba16f"`
+
+
+d3d9.upgrade_RGBA16F_renderTargetTo:
+
+Supported values: `"disabled"`, `"rgba32f"`\
+Default/Fallback: `"disabled"`
 
 
 ## d3d9.enableSwapchainUpgrade
