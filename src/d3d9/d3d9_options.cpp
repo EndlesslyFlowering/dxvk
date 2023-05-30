@@ -15,7 +15,8 @@ namespace dxvk {
     if (format == "disabled") {
       return originalFormat;
     }
-    else if (originalFormat != D3DFMT_A16B16G16R16)
+    else if (originalFormat != D3DFMT_A16B16G16R16
+          || originalFormat != D3DFMT_A16B16G16R16F)
     {
       if (format == "rgb10a2") {
         return D3DFMT_A2B10G10R10;
@@ -214,6 +215,10 @@ namespace dxvk {
     this->upgrade_RGBA16_renderTargetTo = /*default to rgba16f for memory budget reasons*/
       D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA16_renderTargetTo", "rgba16f")),
                            D3DFMT_A16B16G16R16,
+                           false);
+    this->upgrade_RGBA16F_renderTargetTo = /*default to disabled for memory budget reasons*/
+      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_RGBA16F_renderTargetTo", "disabled")),
+                           D3DFMT_A16B16G16R16F,
                            false);
 
     std::string strEnforceWindowModeInternally =

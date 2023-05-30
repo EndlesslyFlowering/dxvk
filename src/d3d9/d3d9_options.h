@@ -157,6 +157,7 @@ namespace dxvk {
     D3DFORMAT upgrade_RGB10A2_renderTargetTo;
     D3DFORMAT upgrade_BGR10A2_renderTargetTo;
     D3DFORMAT upgrade_RGBA16_renderTargetTo;
+    D3DFORMAT upgrade_RGBA16F_renderTargetTo;
 
     /// enable upgrade swapchain
     bool enableSwapchainUpgrade;
