@@ -502,6 +502,7 @@ namespace dxvk {
       D3D9Format RGB10A2;
       D3D9Format BGR10A2;
       D3D9Format RGBA16;
+      D3D9Format RGBA16F;
     };
 
     const upgradeRenderTargetTo ugRtTo = {
@@ -511,7 +512,8 @@ namespace dxvk {
       BGRX8   = D3D9Format(m_device->GetOptions()->upgrade_BGRX8_renderTargetTo),
       RGB10A2 = D3D9Format(m_device->GetOptions()->upgrade_RGB10A2_renderTargetTo),
       BGR10A2 = D3D9Format(m_device->GetOptions()->upgrade_BGR10A2_renderTargetTo),
-      RGBA16  = D3D9Format(m_device->GetOptions()->upgrade_RGBA16_renderTargetTo)
+      RGBA16  = D3D9Format(m_device->GetOptions()->upgrade_RGBA16_renderTargetTo),
+      RGBA16F = D3D9Format(m_device->GetOptions()->upgrade_RGBA16F_renderTargetTo)
     };
 
     D3D9DeviceEx*                 m_device;
