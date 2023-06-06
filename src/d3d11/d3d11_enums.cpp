@@ -14,3 +14,80 @@ std::ostream& operator << (std::ostream& os, D3D_FEATURE_LEVEL e) {
     ENUM_DEFAULT(e);
   }
 }
+
+std::ostream& operator << (std::ostream& os, D3D11_RESOURCE_DIMENSION e) {
+  switch (e) {
+    ENUM_NAME(D3D11_RESOURCE_DIMENSION_UNKNOWN);
+
+    ENUM_NAME(D3D11_RESOURCE_DIMENSION_BUFFER);
+    ENUM_NAME(D3D11_RESOURCE_DIMENSION_TEXTURE1D);
+    ENUM_NAME(D3D11_RESOURCE_DIMENSION_TEXTURE2D);
+    ENUM_NAME(D3D11_RESOURCE_DIMENSION_TEXTURE3D);
+
+    ENUM_DEFAULT(e);
+  }
+}
+
+std::ostream& operator << (std::ostream& os, D3D11_USAGE e) {
+  switch (e) {
+    ENUM_NAME(D3D11_USAGE_DEFAULT);
+    ENUM_NAME(D3D11_USAGE_IMMUTABLE);
+    ENUM_NAME(D3D11_USAGE_DYNAMIC);
+    ENUM_NAME(D3D11_USAGE_STAGING);
+
+    ENUM_DEFAULT(e);
+  }
+}
+
+std::ostream& operator << (std::ostream& os, D3D11_RTV_DIMENSION e) {
+  switch (e) {
+    ENUM_NAME(D3D11_RTV_DIMENSION_UNKNOWN);
+
+    ENUM_NAME(D3D11_RTV_DIMENSION_BUFFER);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE1D);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE1DARRAY);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE2D);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE2DARRAY);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE2DMS);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY);
+    ENUM_NAME(D3D11_RTV_DIMENSION_TEXTURE3D);
+
+    ENUM_DEFAULT(e);
+  }
+}
+
+
+#define ENUM_NAME_BIND_FLAG(BindFlag) \
+          if (BindFlags & BindFlag)  \
+            strstr << #BindFlag << " | "
+
+char* enumerateD3d11BindFlags(UINT BindFlags) {
+  std::stringstream strstr;
+
+  strstr << static_cast<int32_t>(BindFlags) << ": ";
+
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_INDEX_BUFFER);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_CONSTANT_BUFFER);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_STREAM_OUTPUT);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_RENDER_TARGET);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_DEPTH_STENCIL);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_DECODER);
+  ENUM_NAME_BIND_FLAG(D3D11_BIND_VIDEO_ENCODER);
+
+  strstr.width(267);
+
+  std::string str = strstr.str();
+
+  str.resize(str.size() - 3);
+
+  char* pChar = (char*)malloc(268 * sizeof(char));
+
+  sprintf_s(pChar, 268 * sizeof(char), str.c_str());
+
+  return pChar;
+}
+
+#undef ENUM_NAME_BIND_FLAG

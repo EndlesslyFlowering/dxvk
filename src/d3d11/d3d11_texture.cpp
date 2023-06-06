@@ -1,5 +1,6 @@
 #include "d3d11_device.h"
 #include "d3d11_gdi.h"
+#include "d3d11_format_upgrade_helper.h"
 #include "d3d11_texture.h"
 
 #include "../util/util_shared_res.h"
@@ -10,7 +11,7 @@ namespace dxvk {
   D3D11CommonTexture::D3D11CommonTexture(
           ID3D11Resource*             pInterface,
           D3D11Device*                pDevice,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
     const D3D11_ON_12_RESOURCE_INFO*  p11on12Info,
           D3D11_RESOURCE_DIMENSION    Dimension,
           DXGI_USAGE                  DxgiUsage,
@@ -19,28 +20,25 @@ namespace dxvk {
   : m_interface(pInterface), m_device(pDevice), m_dimension(Dimension), m_desc(*pDesc),
     m_11on12(p11on12Info ? *p11on12Info : D3D11_ON_12_RESOURCE_INFO()), m_dxgiUsage(DxgiUsage) {
     DXGI_VK_FORMAT_MODE   formatMode   = GetFormatMode();
-    // DXGI_VK_FORMAT_MODE_COLOR is always a render target
-    if (pDevice->GetOptions()->upgradeRenderTargets
-     && formatMode == DXGI_VK_FORMAT_MODE_COLOR) {
-      const DXGI_FORMAT orgFormat = pDesc->Format;
-      pDesc->Format = upgradeRenderTarget(pDesc->Format, pDevice->GetOptions()->upgradeRenderTargetsDepthOnly);
-      m_desc.Format = pDesc->Format;
-      if (pDevice->GetOptions()->logRenderTargetUpgrades) {
-        if (orgFormat != pDesc->Format) {
-          Logger::info(str::format("D3D11: render target upgrade: ",
-                                   GetDXGIFormatNameAsString(orgFormat),
-                                   " -> ",
-                                   GetDXGIFormatNameAsString(pDesc->Format)));
-        }
-        else
-          Logger::info(str::format("D3D11:   other render target: ",
-                                   GetDXGIFormatNameAsString(pDesc->Format)));
-      }
+
+    if (m_device->GetOptions()->enableRenderTargetUpgrade
+     && formatMode == DXGI_VK_FORMAT_MODE_COLOR // DXGI_VK_FORMAT_MODE_COLOR == render target
+     && !(m_dxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+      m_desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        m_desc.Format,
+                        m_device->GetOptions()->formatUpgradeInfoArray[m_desc.Format].upgradedFormat,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET,
+                        m_device->GetOptions()->logRenderTargetFormatsUsed);
     }
-    else if (pDevice->GetOptions()->logRenderTargetUpgrades) {
-      Logger::info(str::format("D3D11:     other format used: ",
-                               GetDXGIFormatNameAsString(pDesc->Format)));
+    else if (m_device->GetOptions()->enableBackBufferFormatUpgrade
+          && m_dxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+      m_desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        m_desc.Format,
+                        m_device->GetOptions()->upgradeBackBufferFormatTo,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER,
+                        m_device->GetOptions()->logRenderTargetFormatsUsed);
     }
+
     DXGI_VK_FORMAT_INFO   formatInfo   = m_device->LookupFormat(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_FAMILY formatFamily = m_device->LookupFamily(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_INFO   formatPacked = m_device->LookupPackedFormat(m_desc.Format, formatMode);
@@ -1106,7 +1104,7 @@ namespace dxvk {
   //      D 3 D 1 1 T E X T U R E 1 D
   D3D11Texture1D::D3D11Texture1D(
           D3D11Device*                pDevice,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
     const D3D11_ON_12_RESOURCE_INFO*  p11on12Info)
   : D3D11DeviceChild<ID3D11Texture1D>(pDevice),
     m_texture (this, pDevice, pDesc, p11on12Info, D3D11_RESOURCE_DIMENSION_TEXTURE1D, 0, VK_NULL_HANDLE, nullptr),
@@ -1208,7 +1206,7 @@ namespace dxvk {
   //      D 3 D 1 1 T E X T U R E 2 D
   D3D11Texture2D::D3D11Texture2D(
           D3D11Device*                pDevice,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
     const D3D11_ON_12_RESOURCE_INFO*  p11on12Info,
           HANDLE                      hSharedHandle)
   : D3D11DeviceChild<ID3D11Texture2D1>(pDevice),
@@ -1223,7 +1221,7 @@ namespace dxvk {
 
   D3D11Texture2D::D3D11Texture2D(
           D3D11Device*                pDevice,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
           DXGI_USAGE                  DxgiUsage,
           VkImage                     vkImage)
   : D3D11DeviceChild<ID3D11Texture2D1>(pDevice),
@@ -1240,7 +1238,7 @@ namespace dxvk {
   D3D11Texture2D::D3D11Texture2D(
           D3D11Device*                pDevice,
           IUnknown*                   pSwapChain,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
           DXGI_USAGE                  DxgiUsage)
   : D3D11DeviceChild<ID3D11Texture2D1>(pDevice),
     m_texture   (this, pDevice, pDesc, nullptr, D3D11_RESOURCE_DIMENSION_TEXTURE2D, DxgiUsage, VK_NULL_HANDLE, nullptr),
@@ -1386,7 +1384,7 @@ namespace dxvk {
   //      D 3 D 1 1 T E X T U R E 3 D
   D3D11Texture3D::D3D11Texture3D(
           D3D11Device*                pDevice,
-          D3D11_COMMON_TEXTURE_DESC*  pDesc,
+    const D3D11_COMMON_TEXTURE_DESC*  pDesc,
     const D3D11_ON_12_RESOURCE_INFO*  p11on12Info)
   : D3D11DeviceChild<ID3D11Texture3D1>(pDevice),
     m_texture (this, pDevice, pDesc, p11on12Info, D3D11_RESOURCE_DIMENSION_TEXTURE3D, 0, VK_NULL_HANDLE, nullptr),
