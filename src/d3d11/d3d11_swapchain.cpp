@@ -3,7 +3,6 @@
 #include "d3d11_swapchain.h"
 
 #include "../util/util_win32_compat.h"
-#include <dxgiformat.h>
 
 namespace dxvk {
 
@@ -65,7 +64,6 @@ namespace dxvk {
     m_desc(*pDesc),
     m_device(pDevice->GetDXVKDevice()),
     m_frameLatencyCap(pDevice->GetOptions()->maxFrameLatency) {
-    m_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
     CreateFrameLatencyEvent();
     CreatePresenter();
     CreateBackBuffers();
@@ -621,27 +619,13 @@ namespace dxvk {
     desc.TextureLayout      = D3D11_TEXTURE_LAYOUT_UNDEFINED;
 
     if (m_desc.BufferUsage & DXGI_USAGE_RENDER_TARGET_OUTPUT)
-    {
       desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-      if (m_parent->GetOptions()->upgradeRenderTargets)
-      {
-        desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-        m_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-      }
-      Logger::info(str::format("D3D11:  rt: ", GetDXGIFormatNameAsString(desc.Format)));
-    }
 
     if (m_desc.BufferUsage & DXGI_USAGE_SHADER_INPUT)
-    {
       desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-      Logger::info(str::format("D3D11:  sr: ", GetDXGIFormatNameAsString(desc.Format)));
-    }
 
     if (m_desc.BufferUsage & DXGI_USAGE_UNORDERED_ACCESS)
-    {
       desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
-      Logger::info(str::format("D3D11: uav: ", GetDXGIFormatNameAsString(desc.Format)));
-    }
     
     if (m_desc.Flags & DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE)
       desc.MiscFlags |= D3D11_RESOURCE_MISC_GDI_COMPATIBLE;
@@ -730,21 +714,64 @@ namespace dxvk {
     return maxFrameLatency;
   }
 
+  void D3D11SwapChain::SwapChainUpgradeLogger(
+    const VkFormat        OriginalFormat,
+    const VkFormat        UpgradedFormat,
+    const VkColorSpaceKHR UpgradedColorSpace) {
+
+      Logger::info(str::format("DXVK (D3D11): swap chain upgrade:\n",
+                               "                  from: ", OriginalFormat, " + ", m_colorspace, "\n",
+                               "                  to:   ", UpgradedFormat, " + ", UpgradedColorSpace));
+    return;
+  }
 
   uint32_t D3D11SwapChain::PickFormats(
           DXGI_FORMAT               Format,
           VkSurfaceFormatKHR*       pDstFormats) {
     uint32_t n = 0;
 
+    VkFormat        upgradeFormatTo     = m_parent->GetOptions()->upgradeSwapChainFormatTo;
+    VkColorSpaceKHR upgradeColorSpaceTo = m_parent->GetOptions()->upgradeSwapChainColorSpaceTo;
+
+    if (upgradeColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
+      upgradeColorSpaceTo = m_colorspace;
+    }
+
+#define SWAP_CHAIN_UPGRADE_THROW_ERROR(OriginalFormat)                                                              \
+          throw DxvkError(str::format("DXVK (D3D11): No suitable swap chain upgrade combination found!\n",          \
+                                          "              planned upgrade:\n",                                       \
+                                          "                  from: ", OriginalFormat,  " + ", m_colorspace, "\n",   \
+                                          "                  to:   ", upgradeFormatTo, " + ", upgradeColorSpaceTo))
+
     switch (Format) {
       default:
         Logger::warn(str::format("D3D11SwapChain: Unexpected format: ", m_desc.Format));
       [[fallthrough]];
-      
+
       case DXGI_FORMAT_R8G8B8A8_UNORM:
       case DXGI_FORMAT_B8G8R8A8_UNORM: {
-        if (m_parent->GetOptions()->upgradeRenderTargets) {
-          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R8G8B8A8_UNORM);
+            } break;
+          }
+          SwapChainUpgradeLogger(VK_FORMAT_R8G8B8A8_UNORM,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
         else {
           pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
@@ -754,8 +781,23 @@ namespace dxvk {
       
       case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: {
-        if (m_parent->GetOptions()->upgradeRenderTargets) {
-          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_SRGB,       upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_SRGB,       upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R8G8B8A8_SRGB);
+            } break;
+          }
+          SwapChainUpgradeLogger(VK_FORMAT_R8G8B8A8_SRGB,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
         else {
           pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_SRGB, m_colorspace };
@@ -764,8 +806,28 @@ namespace dxvk {
       } break;
       
       case DXGI_FORMAT_R10G10B10A2_UNORM: {
-        if (m_parent->GetOptions()->upgradeRenderTargets) {
-          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_A2B10G10R10_UNORM_PACK32);
+            } break;
+          }
+          SwapChainUpgradeLogger(VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
         else {
           pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
@@ -774,14 +836,30 @@ namespace dxvk {
       } break;
       
       case DXGI_FORMAT_R16G16B16A16_FLOAT: {
-        if (m_parent->GetOptions()->upgradeRenderTargets) {
-          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R16G16B16A16_SFLOAT);
+            } break;
+          }
+          SwapChainUpgradeLogger(VK_FORMAT_R16G16B16A16_SFLOAT,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
         else {
           pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, m_colorspace };
         }
       } break;
     }
+
+#undef SWAP_CHAIN_UPGRADE_THROW_ERROR
 
     return n;
   }
