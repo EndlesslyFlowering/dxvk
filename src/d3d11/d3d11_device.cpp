@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstring>
-#include <dxgiformat.h>
 
 #include <dxbc/dxbc_container.h>
 #include <dxbc/dxbc_parser.h>
@@ -18,11 +17,13 @@
 #include "d3d11_context_def.h"
 #include "d3d11_context_imm.h"
 #include "d3d11_device.h"
+#include "d3d11_enums.h"
 #include "d3d11_fence.h"
 #include "d3d11_input_layout.h"
 #include "d3d11_interop.h"
 #include "d3d11_query.h"
 #include "d3d11_resource.h"
+#include "d3d11_format_upgrade_helper.h"
 #include "d3d11_sampler.h"
 #include "d3d11_shader.h"
 #include "d3d11_state_object.h"
@@ -399,18 +400,23 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-    if (GetOptions()->upgradeRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
-      const DXGI_FORMAT orgFormat = desc.Format;
-      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
-      if (GetOptions()->logRenderTargetUpgrades
-       && orgFormat != desc.Format) {
-        Logger::info(str::format("D3D11: resource view upgrade: ",
-                                  GetDXGIFormatNameAsString(orgFormat),
-                                  " -> ",
-                                  GetDXGIFormatNameAsString(desc.Format)));
+      if (m_d3d11Options.enableRenderTargetUpgrade
+       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
       }
-    }
+      else if (m_d3d11Options.enableBackBufferFormatUpgrade
+            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.upgradeBackBufferFormatTo,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
+      }
 
       if (FAILED(D3D11ShaderResourceView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
@@ -419,12 +425,14 @@ namespace dxvk {
     uint32_t plane = D3D11ShaderResourceView::GetPlaneSlice(&desc);
     
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_SHADER_RESOURCE, desc.Format, plane)) {
+      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create shader resource view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", resourceDesc.BindFlags,
+        "\n  Resource usage:  ", enumeratedBindFlags,
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
         "\n  View plane:      ", plane));
+      free((void*)enumeratedBindFlags);
       return E_INVALIDARG;
     }
     
@@ -500,18 +508,23 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-    if (GetOptions()->upgradeRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
-      const DXGI_FORMAT orgFormat = desc.Format;
-      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
-      if (GetOptions()->logRenderTargetUpgrades
-       && orgFormat != desc.Format) {
-        Logger::info(str::format("D3D11:           UAV upgrade: ",
-                                 GetDXGIFormatNameAsString(orgFormat),
-                                 " -> ",
-                                 GetDXGIFormatNameAsString(desc.Format)));
+      if (m_d3d11Options.enableRenderTargetUpgrade
+       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
       }
-    }
+      else if (m_d3d11Options.enableBackBufferFormatUpgrade
+            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.upgradeBackBufferFormatTo,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
+      }
 
       if (FAILED(D3D11UnorderedAccessView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
@@ -520,12 +533,14 @@ namespace dxvk {
     uint32_t plane = D3D11UnorderedAccessView::GetPlaneSlice(&desc);
 
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_UNORDERED_ACCESS, desc.Format, plane)) {
+      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create unordered access view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", resourceDesc.BindFlags,
+        "\n  Resource usage:  ", enumeratedBindFlags,
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
         "\n  View plane:      ", plane));
+      free((void*)enumeratedBindFlags);
       return E_INVALIDARG;
     }
 
@@ -609,18 +624,23 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-    if (GetOptions()->upgradeRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
-      const DXGI_FORMAT orgFormat = desc.Format;
-      desc.Format = upgradeRenderTarget(desc.Format, GetOptions()->upgradeRenderTargetsDepthOnly);
-      if (GetOptions()->logRenderTargetUpgrades
-       && orgFormat != desc.Format) {
-        Logger::info(str::format("D3D11:           RTV upgrade: ",
-                                 GetDXGIFormatNameAsString(orgFormat),
-                                 " -> ",
-                                 GetDXGIFormatNameAsString(desc.Format)));
+      if (m_d3d11Options.enableRenderTargetUpgrade
+       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
       }
-    }
+      else if (m_d3d11Options.enableBackBufferFormatUpgrade
+            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+                        desc.Format,
+                        m_d3d11Options.upgradeBackBufferFormatTo,
+                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW,
+                        m_d3d11Options.logRenderTargetFormatsUsed);
+      }
 
       if (FAILED(D3D11RenderTargetView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
@@ -629,12 +649,14 @@ namespace dxvk {
     uint32_t plane = D3D11RenderTargetView::GetPlaneSlice(&desc);
 
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_RENDER_TARGET, desc.Format, plane)) {
+      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create render target view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", resourceDesc.BindFlags,
+        "\n  Resource usage:  ", enumeratedBindFlags,
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
         "\n  View plane:      ", plane));
+      free((void*)enumeratedBindFlags);
       return E_INVALIDARG;
     }
 
@@ -678,11 +700,13 @@ namespace dxvk {
     }
     
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_DEPTH_STENCIL, desc.Format, 0)) {
+      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create depth-stencil view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", resourceDesc.BindFlags,
+        "\n  Resource usage:  ", enumeratedBindFlags,
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format));
+      free((void*)enumeratedBindFlags);
       return E_INVALIDARG;
     }
     
@@ -3749,18 +3773,12 @@ namespace dxvk {
 
   HRESULT STDMETHODCALLTYPE DXGIVkSwapChainFactory::CreateSwapChain(
           IDXGIVkSurfaceFactory*    pSurfaceFactory,
-    const DXGI_SWAP_CHAIN_DESC1*    pDescOrg,
+    const DXGI_SWAP_CHAIN_DESC1*    pDesc,
           IDXGIVkSwapChain**        ppSwapChain) {
     InitReturnPtr(ppSwapChain);
 
     try {
       auto vki = m_device->GetDXVKDevice()->adapter()->vki();
-
-      //pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-      DXGI_SWAP_CHAIN_DESC1  pDescDat = *pDescOrg;
-      DXGI_SWAP_CHAIN_DESC1 *pDesc    = &pDescDat;
-      pDesc->Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-      Logger::info(str::format("D3D11: create swap chain: ", GetDXGIFormatNameAsString(pDesc->Format)));
 
       Com<D3D11SwapChain> presenter = new D3D11SwapChain(
         m_container, m_device, pSurfaceFactory, pDesc);
