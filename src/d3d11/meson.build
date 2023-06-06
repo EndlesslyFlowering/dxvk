@@ -2,6 +2,7 @@ d3d11_res = wrc_generator.process('version.rc')
 
 dxgi_common_src = [
   '../dxgi/dxgi_format.cpp',
+  '../dxgi/dxgi_enums.cpp',
 ]
 
 d3d10_src = [
@@ -47,6 +48,7 @@ d3d11_src = [
   'd3d11_query.cpp',
   'd3d11_rasterizer.cpp',
   'd3d11_resource.cpp',
+  'd3d11_format_upgrade_helper.cpp',
   'd3d11_sampler.cpp',
   'd3d11_shader.cpp',
   'd3d11_state.cpp',
