@@ -494,28 +494,6 @@ namespace dxvk {
             D3D9Format* originalFormat,
       const D3D9Format* upgradedFormat);
 
-    struct upgradeRenderTargetTo {
-      D3D9Format RGBA8;
-      D3D9Format RGBX8;
-      D3D9Format BGRA8;
-      D3D9Format BGRX8;
-      D3D9Format RGB10A2;
-      D3D9Format BGR10A2;
-      D3D9Format RGBA16;
-      D3D9Format RGBA16F;
-    };
-
-    const upgradeRenderTargetTo ugRtTo = {
-      RGBA8   = D3D9Format(m_device->GetOptions()->upgrade_RGBA8_renderTargetTo),
-      RGBX8   = D3D9Format(m_device->GetOptions()->upgrade_RGBX8_renderTargetTo),
-      BGRA8   = D3D9Format(m_device->GetOptions()->upgrade_BGRA8_renderTargetTo),
-      BGRX8   = D3D9Format(m_device->GetOptions()->upgrade_BGRX8_renderTargetTo),
-      RGB10A2 = D3D9Format(m_device->GetOptions()->upgrade_RGB10A2_renderTargetTo),
-      BGR10A2 = D3D9Format(m_device->GetOptions()->upgrade_BGR10A2_renderTargetTo),
-      RGBA16  = D3D9Format(m_device->GetOptions()->upgrade_RGBA16_renderTargetTo),
-      RGBA16F = D3D9Format(m_device->GetOptions()->upgrade_RGBA16F_renderTargetTo)
-    };
-
     D3D9DeviceEx*                 m_device;
     D3D9_COMMON_TEXTURE_DESC      m_desc;
     D3DRESOURCETYPE               m_type;

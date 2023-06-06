@@ -150,14 +150,14 @@ namespace dxvk {
     bool enableRenderTargetUpgrade;
 
     /// upgrade specific render target formats
-    D3DFORMAT upgrade_RGBA8_renderTargetTo;
-    D3DFORMAT upgrade_RGBX8_renderTargetTo;
-    D3DFORMAT upgrade_BGRA8_renderTargetTo;
-    D3DFORMAT upgrade_BGRX8_renderTargetTo;
-    D3DFORMAT upgrade_RGB10A2_renderTargetTo;
-    D3DFORMAT upgrade_BGR10A2_renderTargetTo;
-    D3DFORMAT upgrade_RGBA16_renderTargetTo;
-    D3DFORMAT upgrade_RGBA16F_renderTargetTo;
+    D3DFORMAT upgrade_RGBA8_To;
+    D3DFORMAT upgrade_RGBX8_To;
+    D3DFORMAT upgrade_BGRA8_To;
+    D3DFORMAT upgrade_BGRX8_To;
+    D3DFORMAT upgrade_RGB10A2_To;
+    D3DFORMAT upgrade_BGR10A2_To;
+    D3DFORMAT upgrade_RGBA16_To;
+    D3DFORMAT upgrade_RGBA16F_To;
 
     /// enable upgrade swapchain
     bool enableSwapchainUpgrade;
