@@ -170,11 +170,4 @@ namespace dxvk {
 
   };
 
-  DXGI_FORMAT upgradeRenderTarget(
-            DXGI_FORMAT           Format,
-            bool                  upgradeRenderTargetsDepthOnly);
-
-  std::string GetDXGIFormatNameAsString(
-            DXGI_FORMAT           Format);
-
 };
