@@ -73,14 +73,15 @@ namespace dxvk {
     }
 
 
-#define RT_UPGRADE_HELPER(format)                          \
-          m_mapping = ConvertFormatUnfixed(ugRtTo.format); \
-          RtUpgradeLogger(&m_desc.Format, &ugRtTo.format); \
-          break;
+#define RT_UPGRADE_HELPER(format)                                                       \
+          const D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->format); \
+          m_mapping = ConvertFormatUnfixed(upgradedFormat);                             \
+          RtUpgradeLogger(&m_desc.Format, &upgradedFormat);                             \
+          break
 
 #define DEFAULT_FORMAT_MAPPING(isRt)                        \
           m_mapping = pDevice->LookupFormat(m_desc.Format); \
-          FormatLogger(&m_desc.Format, isRt);
+          FormatLogger(&m_desc.Format, isRt)
 
 
     if (m_desc.Usage & D3DUSAGE_RENDERTARGET)
@@ -92,58 +93,58 @@ namespace dxvk {
         {
           case D3D9Format::A8B8G8R8: // RGBA8
           {
-            RT_UPGRADE_HELPER(RGBA8)
+            RT_UPGRADE_HELPER(upgrade_RGBA8_To);
           }
           [[fallthrough]];
           case D3D9Format::X8B8G8R8: // RGBX8
           {
-            RT_UPGRADE_HELPER(RGBX8)
+            RT_UPGRADE_HELPER(upgrade_RGBX8_To);
           }
           [[fallthrough]];
           case D3D9Format::A8R8G8B8: // BGRA8
           {
-            RT_UPGRADE_HELPER(BGRA8)
+            RT_UPGRADE_HELPER(upgrade_BGRA8_To);
           }
           [[fallthrough]];
           case D3D9Format::X8R8G8B8: // BGRX8
           {
-            RT_UPGRADE_HELPER(BGRX8)
+            RT_UPGRADE_HELPER(upgrade_BGRX8_To);
           }
           [[fallthrough]];
           case D3D9Format::A2B10G10R10: // RGB10A2
           {
-            RT_UPGRADE_HELPER(RGB10A2)
+            RT_UPGRADE_HELPER(upgrade_RGB10A2_To);
           }
           [[fallthrough]];
           case D3D9Format::A2R10G10B10: // BGR10A2
           {
-            RT_UPGRADE_HELPER(BGR10A2)
+            RT_UPGRADE_HELPER(upgrade_BGR10A2_To);
           }
           [[fallthrough]];
           case D3D9Format::A16B16G16R16: // RGBA16
           {
-            RT_UPGRADE_HELPER(RGBA16)
+            RT_UPGRADE_HELPER(upgrade_RGBA16_To);
           }
           [[fallthrough]];
           case D3D9Format::A16B16G16R16F: // RGBA16F
           {
-            RT_UPGRADE_HELPER(RGBA16F)
+            RT_UPGRADE_HELPER(upgrade_RGBA16F_To);
           }
           [[fallthrough]];
           default:
           {
-            DEFAULT_FORMAT_MAPPING(true)
+            DEFAULT_FORMAT_MAPPING(true);
             break;
           }
         }
       }
       else
       {
-        DEFAULT_FORMAT_MAPPING(true)
+        DEFAULT_FORMAT_MAPPING(true);
       }
     }
     else {
-      DEFAULT_FORMAT_MAPPING(false)
+      DEFAULT_FORMAT_MAPPING(false);
     }
 
 
