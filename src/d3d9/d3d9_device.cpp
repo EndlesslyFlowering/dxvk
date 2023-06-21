@@ -6747,7 +6747,7 @@ namespace dxvk {
       DxsoBindingType::Image, uint32_t(shaderSampler.second));
 
     const bool srgb =
-      m_state.samplerStates[StateSampler][D3DSAMP_SRGBTEXTURE] & 0x1;
+      m_state.samplerStates[StateSampler][D3DSAMP_SRGBTEXTURE] & 0x1; //hmm
 
     D3D9CommonTexture* commonTex =
       GetCommonTexture(m_state.textures[StateSampler]);
@@ -7998,10 +7998,10 @@ namespace dxvk {
 
 
   HRESULT D3D9DeviceEx::ResetSwapChain(D3DPRESENT_PARAMETERS* pPresentationParameters, D3DDISPLAYMODEEX* pFullscreenDisplayMode) {
-    if (m_d3d9Options.enableSwapchainFormatUpgradeInternal)
-      pPresentationParameters->BackBufferFormat = m_d3d9Options.upgradeSwapchainFormatInternalTo;
-    if (m_d3d9Options.enforceWindowModeInternally)
+    if (m_d3d9Options.enforceWindowModeInternally) {
       pPresentationParameters->Windowed = m_d3d9Options.enforcedWindowModeInternally;
+    }
+
     D3D9Format backBufferFmt = EnumerateFormat(pPresentationParameters->BackBufferFormat);
     bool unlockedFormats = m_implicitSwapchain != nullptr && m_implicitSwapchain->HasFormatsUnlocked();
 
