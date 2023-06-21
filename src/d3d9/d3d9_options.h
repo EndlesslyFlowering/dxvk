@@ -1,11 +1,17 @@
 #pragma once
 
+#include <array>
+
 #include <d3d9.h>
 
 #include "../util/config/config.h"
 #include "../dxvk/dxvk_device.h"
 
 namespace dxvk {
+
+  bool IsSensibleFormatUpgrade(
+    const D3DFORMAT OriginalFormat,
+    const D3DFORMAT UpgradedFormat);
 
   enum class D3D9FloatEmulation {
     Disabled,
@@ -147,42 +153,44 @@ namespace dxvk {
     bool clampNegativeLodBias;
 
     /// upgrades render targets
-    bool enableRenderTargetUpgrade;
+    bool enableRenderTargetUpgrades;
+
+    /// array that describes which format will be ugprade to which
+    std::array<D3DFORMAT, 200> formatUpgradeArray;
 
     /// upgrade specific render target formats
-    D3DFORMAT upgrade_RGBA8_To;
-    D3DFORMAT upgrade_RGBX8_To;
-    D3DFORMAT upgrade_BGRA8_To;
-    D3DFORMAT upgrade_BGRX8_To;
-    D3DFORMAT upgrade_RGB10A2_To;
-    D3DFORMAT upgrade_BGR10A2_To;
-    D3DFORMAT upgrade_RGBA16_To;
-    D3DFORMAT upgrade_RGBA16F_To;
+    //D3DFORMAT upgrade_RGBA8_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_RGBX8_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_BGRA8_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_BGRX8_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_RGB10A2_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_BGR10A2_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_RGBA16_UNORM_renderTargetTo;
+    //D3DFORMAT upgrade_RGBA16_FLOAT_renderTargetTo;
 
-    /// enable upgrade swapchain
-    bool enableSwapchainUpgrade;
+    /// enable back buffer format upgrade
+    bool enableBackBufferFormatUpgrade;
+
+    /// upgrade back buffer format to
+    D3DFORMAT upgradeBackBufferFormatTo;
+
+    /// enable upgrade swap chain
+    bool enableSwapChainUpgrade;
 
     /// which output format to upgrade to
-    VkFormat upgradeSwapchainFormatTo;
+    VkFormat upgradeSwapChainFormatTo;
 
     /// output color space to upgrade to
-    VkColorSpaceKHR upgradeSwapchainColorSpaceTo;
+    VkColorSpaceKHR upgradeSwapChainColorSpaceTo;
 
-    /// Upgrade output format in the virtual D3D9 swapchain
-    /// may or may not cause issues. Basically cosmetics ;)
-    bool enableSwapchainFormatUpgradeInternal;
+    /// disables 
+    //bool disableSrgbSamplingAndWriting;
 
-    /// which internal output format upgrade to
-    D3DFORMAT upgradeSwapchainFormatInternalTo;
-
-    /// log formats used
+    /// log render target formats used
     bool logRenderTargetFormatsUsed;
 
-    /// log formats used
-    bool logFormatsUsed;
-
     /// enfore fullscreen exclusive or windowed mode
-    /// for the internal swapchain
+    /// for the internal swap chain
     bool enforceWindowModeInternally;
 #if defined(_MSC_VER)
     BOOL

@@ -1144,42 +1144,75 @@ namespace dxvk {
     return maxFrameLatency;
   }
 
+  void D3D9SwapChainEx::SwapChainUpgradeLogger(
+    const VkFormat        OriginalFormat,
+    const VkFormat        UpgradedFormat,
+    const VkColorSpaceKHR UpgradedColorSpace) {
+
+    Logger::info(str::format("DXVK (D3D9): swap chain upgrade:\n",
+                             "                 from: ", OriginalFormat, " + ", VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, "\n",
+                             "                 to:   ", UpgradedFormat, " + ", UpgradedColorSpace));
+    return;
+  }
 
   uint32_t D3D9SwapChainEx::PickFormats(
           D3D9Format                Format,
           VkSurfaceFormatKHR*       pDstFormats) {
     uint32_t n = 0;
 
-    VkFormat        ugFmtTo = m_parent->GetOptions()->upgradeSwapchainFormatTo;
-    VkColorSpaceKHR ugCspTo = m_parent->GetOptions()->upgradeSwapchainColorSpaceTo;
+    VkFormat        upgradeFormatTo     = m_parent->GetOptions()->upgradeSwapChainFormatTo;
+    VkColorSpaceKHR upgradeColorSpaceTo = m_parent->GetOptions()->upgradeSwapChainColorSpaceTo;
+
+    if (upgradeColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
+      upgradeColorSpaceTo = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+    }
+
+#define SWAP_CHAIN_UPGRADE_THROW_ERROR(OriginalFormat)                                                                               \
+          throw DxvkError(str::format("DXVK (D3D9): No suitable swap chain upgrade combination found!\n",                                       \
+                                          "             planned upgrade:\n",                                                                    \
+                                          "                 from: ", OriginalFormat,  " + ", VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, "\n", \
+                                          "                 to:   ", upgradeFormatTo, " + ", upgradeColorSpaceTo))
+
 
     switch (Format) {
       default:
         Logger::warn(str::format("D3D9SwapChainEx: Unexpected format: ", Format));
      [[fallthrough]];
 
-      // mappings are based on the format + color space combos the current AMD Windows driver supports
-      case D3D9Format::A8R8G8B8:
-      case D3D9Format::X8R8G8B8:
       case D3D9Format::A8B8G8R8:
-      case D3D9Format::X8B8G8R8: {
-        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
-          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
+      case D3D9Format::X8B8G8R8:
+      case D3D9Format::A8R8G8B8:
+      case D3D9Format::X8R8G8B8: {
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_R16G16B16A16_UNORM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_R8G8B8A8_UNORM:
+            case VK_FORMAT_B8G8R8A8_UNORM: {
+              pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R8G8B8A8_UNORM);
+            }
           }
-          else if (ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
-          }
-          else if (ugFmtTo == VK_FORMAT_A2B10G10R10_UNORM_PACK32
-                || ugFmtTo == VK_FORMAT_A2R10G10B10_UNORM_PACK32) {
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
-          }
+          SwapChainUpgradeLogger(VK_FORMAT_R8G8B8A8_UNORM,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
         else {
           pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM, m_colorspace };
@@ -1187,52 +1220,87 @@ namespace dxvk {
         }
       } break;
 
-      case D3D9Format::A2R10G10B10:
-      case D3D9Format::A2B10G10R10: {
-        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
-          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
+      case D3D9Format::A2B10G10R10:
+      case D3D9Format::A2R10G10B10: {
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_R16G16B16A16_UNORM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+              pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_A2B10G10R10_UNORM_PACK32);
+            } break;
           }
-          else if (ugFmtTo == VK_FORMAT_R16G16B16A16_UNORM) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, ugCspTo };
-            pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, ugCspTo };
-          }
+          SwapChainUpgradeLogger(VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
-        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           m_colorspace };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           m_colorspace };
+        else {
+          pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorspace };
+          pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, m_colorspace };
+        }
       } break;
 
       case D3D9Format::A16B16G16R16: {
-        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
-          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_R16G16B16A16_UNORM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,  upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,  upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R16G16B16A16_UNORM);
+            } break;
           }
+          SwapChainUpgradeLogger(VK_FORMAT_R16G16B16A16_UNORM,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
-        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        else {
+          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        }
       } break;
 
       case D3D9Format::A16B16G16R16F: {
-        if (m_parent->GetOptions()->enableSwapchainUpgrade) {
-          if (ugFmtTo == VK_FORMAT_R16G16B16A16_SFLOAT) {
-            pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, ugCspTo };
+        if (m_parent->GetOptions()->enableSwapChainUpgrade) {
+          switch(upgradeFormatTo)
+          {
+            case VK_FORMAT_R16G16B16A16_SFLOAT: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            case VK_FORMAT_MAX_ENUM: {
+              pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            } break;
+            default: {
+              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R16G16B16A16_SFLOAT);
+            } break;
           }
+          SwapChainUpgradeLogger(VK_FORMAT_R16G16B16A16_SFLOAT,
+                                 upgradeFormatTo,
+                                 upgradeColorSpaceTo);
         }
-        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT,      VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_UNORM,       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_A2R10G10B10_UNORM_PACK32, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_R8G8B8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
-        pDstFormats[n++] = { VK_FORMAT_B8G8R8A8_UNORM,           VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        else {
+          pDstFormats[n++] = { VK_FORMAT_R16G16B16A16_SFLOAT, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
+        }
       } break;
 
       case D3D9Format::X1R5G5B5:
@@ -1247,6 +1315,8 @@ namespace dxvk {
         pDstFormats[n++] = { VK_FORMAT_R5G6B5_UNORM_PACK16, m_colorspace };
       } break;
     }
+
+#undef SWAP_CHAIN_UPGRADE_THROW_ERROR
 
     return n;
   }
