@@ -7,9 +7,11 @@ All options are also explained in the default [dxvk.conf](dxvk.conf)!
 
 - [d3d9.enableRenderTargetUpgrade](#d3d9enableRenderTargetUpgrade)
 - [d3d9.upgrade_***_renderTargetTo](#d3d9upgrade__renderTargetTo)
-- [d3d9.enableSwapchainUpgrade](#d3d9enableSwapchainUpgrade)
-- [d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo)
-- [d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo)
+- [d3d9.enableBackBufferFormatUpgrade](d3d9enableBackBufferFormatUpgrade)
+- [d3d9.upgradeBackBufferFormatTo](#d3d9upgradeBackBufferFormatTo)
+- [d3d9.enableSwapChainUpgrade](#d3d9enableSwapChainUpgrade)
+- [d3d9.upgradeSwapChainFormatTo](#d3d9upgradeSwapChainFormatTo)
+- [d3d9.upgradeSwapChainColorSpaceTo](#d3d9upgradeSwapChainColorSpaceTo)
 - [d3d9.enforceWindowModeInternally](#d3d9enforceWindowModeInternally)
 - [d3d9.logRenderTargetFormatsUsed](#d3d9logRenderTargetFormatsUsed)
 
@@ -27,65 +29,81 @@ Default/Fallback: `False`
 ## d3d9.upgrade_***_renderTargetTo
 
 Individual render target upgrades per format.\
-These may cause visual issues. Check [d3d9.logRenderTargetFormatsUsed](#d3d9logRenderTargetFormatsUsed) to fix those.\
-Watch out for memory usage on 32 bit applications! Using `"rgba32f"` there can cause crashes or the game not loading.
+These may cause visual issues. Check [d3d9.logRenderTargetFormatsUsed](#d3d9logRenderTargetFormatsUsed) to fix those.
 
-Setting `d3d9.upgrade_***_renderTargetTo = "rgba16f"` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
-This needs '[d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo) = "rgba16f"' and '[d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo) = "scRGB"' otherwise they are lost again.\
+Setting `d3d9.upgrade_***_renderTargetTo = rgba16_float` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
+This needs '[d3d9.upgradeSwapChainFormatTo](#d3d9upgradeSwapChainFormatTo) = rgba16_float' and '[d3d9.upgradeSwapChainColorSpaceTo](#d3d9upgradeSwapChainColorSpaceTo) = scRGB' otherwise they are lost again.\
 Additionally further post processing is needed to display the game correctly.
 
 what option corresponds to what format:
 
-| option  | format                 | type             | allows 'overbright' extraction |
-|---------|------------------------|------------------|--------------------------------|
-| RGBA8   | `D3DFMT_A8B8G8R8`      | unsigned integer | no                             |
-| RGBX8   | `D3DFMT_X8B8G8R8`      | unsigned integer | no                             |
-| BGRA8   | `D3DFMT_A8R8G8B8`      | unsigned integer | no                             |
-| BGRX8   | `D3DFMT_X8R8G8B8`      | unsigned integer | no                             |
-| RGB10A2 | `D3DFMT_A2B10G10R10`   | unsigned integer | no                             |
-| BGR10A2 | `D3DFMT_A2R10G10B10`   | unsigned integer | no                             |
-| RGBA16  | `D3DFMT_A16B16G16R16`  | unsigned integer | no                             |
-| RGBA16F | `D3DFMT_A16B16G16R16F` | float            | yes                            |
-| RGBA32F | `D3DFMT_A32B32G32R32F` | float            | yes                            |
+| option        | format                 | allows 'overbright' extraction |
+|---------------|------------------------|--------------------------------|
+| RGBA8_UNORM   | `D3DFMT_A8B8G8R8`      | no                             |
+| RGBX8_UNORM   | `D3DFMT_X8B8G8R8`      | no                             |
+| BGRA8_UNORM   | `D3DFMT_A8R8G8B8`      | no                             |
+| BGRX8_UNORM   | `D3DFMT_X8R8G8B8`      | no                             |
+| RGB10A2_UNORM | `D3DFMT_A2B10G10R10`   | no                             |
+| BGR10A2_UNORM | `D3DFMT_A2R10G10B10`   | no                             |
+| RGBA16_UNORM  | `D3DFMT_A16B16G16R16`  | no                             |
+| RGBA16_FLOAT  | `D3DFMT_A16B16G16R16F` | yes                            |
+| RGBA32_FLOAT  | `D3DFMT_A32B32G32R32F` | yes                            |
 
-d3d9.upgrade_RGBA8_renderTargetTo:\
-d3d9.upgrade_RGBX8_renderTargetTo:\
-d3d9.upgrade_BGRA8_renderTargetTo:\
-d3d9.upgrade_BGRX8_renderTargetTo:\
-d3d9.upgrade_RGB10A2_renderTargetTo:\
-d3d9.upgrade_BGR10A2_renderTargetTo:
+d3d9.upgrade_RGBA8_UNORM_renderTargetTo:\
+d3d9.upgrade_RGBX8_UNORM_renderTargetTo:\
+d3d9.upgrade_BGRA8_UNORM_renderTargetTo:\
+d3d9.upgrade_BGRX8_UNORM_renderTargetTo:\
+d3d9.upgrade_RGB10A2_UNORM_renderTargetTo:\
+d3d9.upgrade_BGR10A2_UNORM_renderTargetTo:
 
-Supported values: `"disabled"`, `"rgb10a2"`, `"bgr10a2"`, `"rgba16"`, `"rgba16f"`, `"rgba32f"`\
-Default/Fallback: `"rgba16f"`
-
-
-d3d9.upgrade_RGBA16_renderTargetTo:
-
-Supported values: `"disabled"`, `"rgba16f"`, `"rgba32f"`\
-Default/Fallback: `"rgba16f"`
+Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+Default/Fallback: `disabled`
 
 
-d3d9.upgrade_RGBA16F_renderTargetTo:
+d3d9.upgrade_RGBA16_UNORM_renderTargetTo:
 
-Supported values: `"disabled"`, `"rgba32f"`\
-Default/Fallback: `"disabled"`
+Supported values: `disabled`, `rgba16_float`, `rgba32_float`\
+Default/Fallback: `disabled`
 
 
-## d3d9.enableSwapchainUpgrade
+d3d9.upgrade_RGBA16_FLOAT_renderTargetTo:
 
-Enable Upgrading the swapchain format and color space.\
-See [d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo) and [d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo).
+Supported values: `disabled`, `rgba32_float`\
+Default/Fallback: `disabled`
+
+
+## d3d9.enableBackBufferFormatUpgrade
+
+Enable upgrading the back buffer format.\
+Set the format with [d3d9.upgradeBackBufferFormatTo](#d3d9upgradeBackBufferFormatTo).
 
 Supported values: `True`, `False`\
 Default/Fallback: `False`
 
 
-## d3d9.upgradeSwapchainFormatTo
+## d3d9.upgradeBackBufferFormatTo
+Upgrade the back buffer format to another format.
+Needs '[d3d9.enableBackBufferFormatUpgrade](d3d9enableBackBufferFormatUpgrade) = True'!
+
+Supported values: disabled, rgb10a2_unorm, bgr10a2_unorm, rgba16_unorm, rgba16_float, rgba32_float
+Default/Fallback: disabled
+
+
+## d3d9.enableSwapChainUpgrade
+
+Enable upgrading the swap chain format and color space.\
+See [d3d9.upgradeSwapChainFormatTo](#d3d9upgradeSwapChainFormatTo) and [d3d9.upgradeSwapChainColorSpaceTo](#d3d9upgradeSwapChainColorSpaceTo). Both have to not be disabled for the upgrade to be enabled.
+
+Supported values: `True`, `False`\
+Default/Fallback: `False`
+
+
+## d3d9.upgradeSwapChainFormatTo
 
 Upgrade the output format to a higher bit depth one.
 
-Needs '[d3d9.enableSwapchainUpgrade](#d3d9enableSwapchainUpgrade) = True'!\
-Use in combination with [d3d9.upgradeSwapchainColorSpaceTo](#d3d9upgradeSwapchainColorSpaceTo)!
+Needs '[d3d9.enableSwapChainUpgrade](#d3d9enableSwapChainUpgrade) = True'!\
+Use in combination with [d3d9.upgradeSwapChainColorSpaceTo](#d3d9upgradeSwapChainColorSpaceTo)!
 
 What works depends on your hardware and display combination.\
 AMD graphics cards on Windows allow for a stupid amount of combinations.
@@ -96,22 +114,22 @@ Check the allowed ones with:\
 On Windows open up powershell and input this:\
 `vulkaninfo | Select-String -CaseSensitive "format =|colorSpace ="`
 
-There is a fallback mechanism in place if the format + color space combo is not allowed. Check the logs to see what combo is being used.
+Check the logs to see what format is being used and to see if it actually works.
 
-Supported values: `"disabled"`, `"rgb10a2"`, `"bgr10a2"`, `"rgba16"`, `"rgba16f"`\
-Default/Fallback: `"rgba16f"`
+Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`\
+Default/Fallback: `disabled`
 
 
-## d3d9.upgradeSwapchainColorSpaceTo
+## d3d9.upgradeSwapChainColorSpaceTo
 
 Upgrade the output color space.
-Needs '[d3d9.enableSwapchainUpgrade](#d3d9enableSwapchainUpgrade) = True'!\
-Use in combination with [d3d9.upgradeSwapchainFormatTo](#d3d9upgradeSwapchainFormatTo)!
+Needs '[d3d9.enableSwapChainUpgrade](#d3d9enableSwapChainUpgrade) = True'!\
+Use in combination with [d3d9.upgradeSwapChainFormatTo](#d3d9upgradeSwapChainFormatTo)!
 
-There is a fallback mechanism in place if the format + color space combo is not allowed. Check the logs to see what combo is being used.
+Check the logs to see what color space is being used and to see if it actually works.
 
-Supported values: `"disabled"`, `"PQ"`, `"scRGB"`\
-Default/Fallback: `"scRGB"`
+Supported values: `disabled`, `PQ`, `scRGB`\
+Default/Fallback: `disabled`
 
 
 ## d3d9.enforceWindowModeInternally
@@ -120,8 +138,8 @@ Enforce the internal window mode. This also affects the window DXVK creates.\
 This is mainly a workaround for games with buggy window code.\
 Some games switch between windowed and fullscreen, which might cause issues with HDR engaging when using Vulkan's FSE.
 
-Supported values: `"disabled"`, `"windowed"`, `"fullscreen"`\
-Default/Fallback: `"disabled"`
+Supported values: `disabled`, `windowed`, `fullscreen`\
+Default/Fallback: `disabled`
 
 
 ## d3d9.logRenderTargetFormatsUsed
@@ -136,36 +154,40 @@ Default/Fallback: `False`
 
 ## Example Usage
 
-Output "overbright" data (needs further post processing):
-```ini
-d3d9.enableRenderTargetUpgrade = true
-d3d9.upgrade_RGBA8_renderTargetTo   = "rgba16f"
-d3d9.upgrade_RGBX8_renderTargetTo   = "rgba16f"
-d3d9.upgrade_BGRA8_renderTargetTo   = "rgba16f"
-d3d9.upgrade_BGRX8_renderTargetTo   = "rgba16f"
-d3d9.upgrade_RGB10A2_renderTargetTo = "rgba16f"
-d3d9.upgrade_BGR10A2_renderTargetTo = "rgba16f"
-d3d9.upgrade_RGBA16_renderTargetTo  = "rgba16f"
-d3d9.enableSwapchainUpgrade = true
-d3d9.upgradeSwapchainFormatTo = "rgba16f"
-d3d9.upgradeSwapchainColorSpaceTo = "scRGB"
-```
+- output 'overbright' data (needs further post processing):
+    ```ini
+    d3d9.enableRenderTargetUpgrade            = true
+    d3d9.upgrade_RGBA8_UNORM_renderTargetTo   = rgba16_float
+    d3d9.upgrade_RGBX8_UNORM_renderTargetTo   = rgba16_float
+    d3d9.upgrade_BGRA8_UNORM_renderTargetTo   = rgba16_float
+    d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_float
+    d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_float
+    d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_float
+    d3d9.upgrade_RGBA16_UNORM_renderTargetTo  = rgba16_float
+    d3d9.enableBackBufferFormatUpgrade        = true
+    d3d9.upgradeBackBufferFormatTo            = rgba16_float
+    d3d9.enableSwapChainUpgrade               = true
+    d3d9.upgradeSwapChainFormatTo             = rgba16_float
+    d3d9.upgradeSwapChainColorSpaceTo         = scRGB
+    ```
 
-Get rid off banding issues:
-```ini
-d3d9.enableRenderTargetUpgrade = true
-d3d9.upgrade_RGBA8_renderTargetTo   = "rgba16"
-d3d9.upgrade_RGBX8_renderTargetTo   = "rgba16"
-d3d9.upgrade_BGRA8_renderTargetTo   = "rgba16"
-d3d9.upgrade_BGRX8_renderTargetTo   = "rgba16"
-d3d9.upgrade_RGB10A2_renderTargetTo = "rgba16"
-d3d9.upgrade_BGR10A2_renderTargetTo = "rgba16"
-d3d9.upgrade_RGBA16_renderTargetTo  = "disabled"
-d3d9.enableSwapchainUpgrade = true
-d3d9.upgradeSwapchainFormatTo = "rgb10a2"
-d3d9.upgradeSwapchainColorSpaceTo = "disabled"
-```
-on AMD you can use:
-```ini
-d3d9.upgradeSwapchainFormatTo = "rgba16"
-```
+- get rid off banding issues:
+    ```ini
+    d3d9.enableRenderTargetUpgrade            = true
+    d3d9.upgrade_RGBA8_UNORM_renderTargetTo   = rgba16_unorm
+    d3d9.upgrade_RGBX8_UNORM_renderTargetTo   = rgba16_unorm
+    d3d9.upgrade_BGRA8_UNORM_renderTargetTo   = rgba16_unorm
+    d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_unorm
+    d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_unorm
+    d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_unorm
+    d3d9.upgrade_RGBA16_UNORM_renderTargetTo  = disabled
+    d3d9.enableBackBufferFormatUpgrade        = true
+    d3d9.upgradeBackBufferFormatTo            = rgba16_unorm
+    d3d9.enableSwapChainUpgrade               = true
+    d3d9.upgradeSwapChainFormatTo             = rgb10a2_unorm
+    d3d9.upgradeSwapChainColorSpaceTo         = disabled
+    ```
+    on AMD you can use:
+    ```ini
+    d3d9.upgradeSwapChainFormatTo             = rgba16_unorm
+    ```
