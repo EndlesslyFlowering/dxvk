@@ -6,185 +6,230 @@ namespace dxvk {
 
   //HDR-mod helpers start
   std::string GetD3DFormatAsString(
-    const D3DFORMAT format)
+    const D3DFORMAT Format)
   {
     return
-      format == D3DFMT_UNKNOWN             ? "D3DFMT_UNKNOWN            "
-    : format == D3DFMT_R8G8B8              ? "D3DFMT_R8G8B8             "
-    : format == D3DFMT_A8R8G8B8            ? "D3DFMT_A8R8G8B8           "
-    : format == D3DFMT_X8R8G8B8            ? "D3DFMT_X8R8G8B8           "
-    : format == D3DFMT_R5G6B5              ? "D3DFMT_R5G6B5             "
-    : format == D3DFMT_X1R5G5B5            ? "D3DFMT_X1R5G5B5           "
-    : format == D3DFMT_A1R5G5B5            ? "D3DFMT_A1R5G5B5           "
-    : format == D3DFMT_A4R4G4B4            ? "D3DFMT_A4R4G4B4           "
-    : format == D3DFMT_R3G3B2              ? "D3DFMT_R3G3B2             "
-    : format == D3DFMT_A8                  ? "D3DFMT_A8                 "
-    : format == D3DFMT_A8R3G3B2            ? "D3DFMT_A8R3G3B2           "
-    : format == D3DFMT_X4R4G4B4            ? "D3DFMT_X4R4G4B4           "
-    : format == D3DFMT_A2B10G10R10         ? "D3DFMT_A2B10G10R10        "
-    : format == D3DFMT_A8B8G8R8            ? "D3DFMT_A8B8G8R8           "
-    : format == D3DFMT_X8B8G8R8            ? "D3DFMT_X8B8G8R8           "
-    : format == D3DFMT_G16R16              ? "D3DFMT_G16R16             "
-    : format == D3DFMT_A2R10G10B10         ? "D3DFMT_A2R10G10B10        "
-    : format == D3DFMT_A16B16G16R16        ? "D3DFMT_A16B16G16R16       "
-    : format == D3DFMT_A8P8                ? "D3DFMT_A8P8               "
-    : format == D3DFMT_P8                  ? "D3DFMT_P8                 "
-    : format == D3DFMT_L8                  ? "D3DFMT_L8                 "
-    : format == D3DFMT_A8L8                ? "D3DFMT_A8L8               "
-    : format == D3DFMT_A4L4                ? "D3DFMT_A4L4               "
-    : format == D3DFMT_V8U8                ? "D3DFMT_V8U8               "
-    : format == D3DFMT_L6V5U5              ? "D3DFMT_L6V5U5             "
-    : format == D3DFMT_X8L8V8U8            ? "D3DFMT_X8L8V8U8           "
-    : format == D3DFMT_Q8W8V8U8            ? "D3DFMT_Q8W8V8U8           "
-    : format == D3DFMT_V16U16              ? "D3DFMT_V16U16             "
-    : format == D3DFMT_A2W10V10U10         ? "D3DFMT_A2W10V10U10        "
-    : format == D3DFMT_UYVY                ? "D3DFMT_UYVY               "
-    : format == D3DFMT_R8G8_B8G8           ? "D3DFMT_R8G8_B8G8          "
-    : format == D3DFMT_YUY2                ? "D3DFMT_YUY2               "
-    : format == D3DFMT_G8R8_G8B8           ? "D3DFMT_G8R8_G8B8          "
-    : format == D3DFMT_DXT1                ? "D3DFMT_DXT1               "
-    : format == D3DFMT_DXT2                ? "D3DFMT_DXT2               "
-    : format == D3DFMT_DXT3                ? "D3DFMT_DXT3               "
-    : format == D3DFMT_DXT4                ? "D3DFMT_DXT4               "
-    : format == D3DFMT_DXT5                ? "D3DFMT_DXT5               "
-    : format == D3DFMT_D16_LOCKABLE        ? "D3DFMT_D16_LOCKABLE       "
-    : format == D3DFMT_D32                 ? "D3DFMT_D32                "
-    : format == D3DFMT_D15S1               ? "D3DFMT_D15S1              "
-    : format == D3DFMT_D24S8               ? "D3DFMT_D24S8              "
-    : format == D3DFMT_D24X8               ? "D3DFMT_D24X8              "
-    : format == D3DFMT_D24X4S4             ? "D3DFMT_D24X4S4            "
-    : format == D3DFMT_D16                 ? "D3DFMT_D16                "
-    : format == D3DFMT_D32F_LOCKABLE       ? "D3DFMT_D32F_LOCKABLE      "
-    : format == D3DFMT_D24FS8              ? "D3DFMT_D24FS8             "
-    : format == D3DFMT_D32_LOCKABLE        ? "D3DFMT_D32_LOCKABLE       "
-    : format == D3DFMT_S8_LOCKABLE         ? "D3DFMT_S8_LOCKABLE        "
-    : format == D3DFMT_L16                 ? "D3DFMT_L16                "
-    : format == D3DFMT_VERTEXDATA          ? "D3DFMT_VERTEXDATA         "
-    : format == D3DFMT_INDEX16             ? "D3DFMT_INDEX16            "
-    : format == D3DFMT_INDEX32             ? "D3DFMT_INDEX32            "
-    : format == D3DFMT_Q16W16V16U16        ? "D3DFMT_Q16W16V16U16       "
-    : format == D3DFMT_MULTI2_ARGB8        ? "D3DFMT_MULTI2_ARGB8       "
-    : format == D3DFMT_R16F                ? "D3DFMT_R16F               "
-    : format == D3DFMT_G16R16F             ? "D3DFMT_G16R16F            "
-    : format == D3DFMT_A16B16G16R16F       ? "D3DFMT_A16B16G16R16F      "
-    : format == D3DFMT_R32F                ? "D3DFMT_R32F               "
-    : format == D3DFMT_G32R32F             ? "D3DFMT_G32R32F            "
-    : format == D3DFMT_A32B32G32R32F       ? "D3DFMT_A32B32G32R32F      "
-    : format == D3DFMT_CxV8U8              ? "D3DFMT_CxV8U8             "
-    : format == D3DFMT_A1                  ? "D3DFMT_A1                 "
-    : format == D3DFMT_A2B10G10R10_XR_BIAS ? "D3DFMT_A2B10G10R10_XR_BIAS"
-    : format == D3DFMT_BINARYBUFFER        ? "D3DFMT_BINARYBUFFER       "
+      Format == D3DFMT_UNKNOWN             ? "D3DFMT_UNKNOWN            "
+    : Format == D3DFMT_R8G8B8              ? "D3DFMT_R8G8B8             "
+    : Format == D3DFMT_A8R8G8B8            ? "D3DFMT_A8R8G8B8           "
+    : Format == D3DFMT_X8R8G8B8            ? "D3DFMT_X8R8G8B8           "
+    : Format == D3DFMT_R5G6B5              ? "D3DFMT_R5G6B5             "
+    : Format == D3DFMT_X1R5G5B5            ? "D3DFMT_X1R5G5B5           "
+    : Format == D3DFMT_A1R5G5B5            ? "D3DFMT_A1R5G5B5           "
+    : Format == D3DFMT_A4R4G4B4            ? "D3DFMT_A4R4G4B4           "
+    : Format == D3DFMT_R3G3B2              ? "D3DFMT_R3G3B2             "
+    : Format == D3DFMT_A8                  ? "D3DFMT_A8                 "
+    : Format == D3DFMT_A8R3G3B2            ? "D3DFMT_A8R3G3B2           "
+    : Format == D3DFMT_X4R4G4B4            ? "D3DFMT_X4R4G4B4           "
+    : Format == D3DFMT_A2B10G10R10         ? "D3DFMT_A2B10G10R10        "
+    : Format == D3DFMT_A8B8G8R8            ? "D3DFMT_A8B8G8R8           "
+    : Format == D3DFMT_X8B8G8R8            ? "D3DFMT_X8B8G8R8           "
+    : Format == D3DFMT_G16R16              ? "D3DFMT_G16R16             "
+    : Format == D3DFMT_A2R10G10B10         ? "D3DFMT_A2R10G10B10        "
+    : Format == D3DFMT_A16B16G16R16        ? "D3DFMT_A16B16G16R16       "
+    : Format == D3DFMT_A8P8                ? "D3DFMT_A8P8               "
+    : Format == D3DFMT_P8                  ? "D3DFMT_P8                 "
+    : Format == D3DFMT_L8                  ? "D3DFMT_L8                 "
+    : Format == D3DFMT_A8L8                ? "D3DFMT_A8L8               "
+    : Format == D3DFMT_A4L4                ? "D3DFMT_A4L4               "
+    : Format == D3DFMT_V8U8                ? "D3DFMT_V8U8               "
+    : Format == D3DFMT_L6V5U5              ? "D3DFMT_L6V5U5             "
+    : Format == D3DFMT_X8L8V8U8            ? "D3DFMT_X8L8V8U8           "
+    : Format == D3DFMT_Q8W8V8U8            ? "D3DFMT_Q8W8V8U8           "
+    : Format == D3DFMT_V16U16              ? "D3DFMT_V16U16             "
+    : Format == D3DFMT_A2W10V10U10         ? "D3DFMT_A2W10V10U10        "
+    : Format == D3DFMT_UYVY                ? "D3DFMT_UYVY               "
+    : Format == D3DFMT_R8G8_B8G8           ? "D3DFMT_R8G8_B8G8          "
+    : Format == D3DFMT_YUY2                ? "D3DFMT_YUY2               "
+    : Format == D3DFMT_G8R8_G8B8           ? "D3DFMT_G8R8_G8B8          "
+    : Format == D3DFMT_DXT1                ? "D3DFMT_DXT1               "
+    : Format == D3DFMT_DXT2                ? "D3DFMT_DXT2               "
+    : Format == D3DFMT_DXT3                ? "D3DFMT_DXT3               "
+    : Format == D3DFMT_DXT4                ? "D3DFMT_DXT4               "
+    : Format == D3DFMT_DXT5                ? "D3DFMT_DXT5               "
+    : Format == D3DFMT_D16_LOCKABLE        ? "D3DFMT_D16_LOCKABLE       "
+    : Format == D3DFMT_D32                 ? "D3DFMT_D32                "
+    : Format == D3DFMT_D15S1               ? "D3DFMT_D15S1              "
+    : Format == D3DFMT_D24S8               ? "D3DFMT_D24S8              "
+    : Format == D3DFMT_D24X8               ? "D3DFMT_D24X8              "
+    : Format == D3DFMT_D24X4S4             ? "D3DFMT_D24X4S4            "
+    : Format == D3DFMT_D16                 ? "D3DFMT_D16                "
+    : Format == D3DFMT_D32F_LOCKABLE       ? "D3DFMT_D32F_LOCKABLE      "
+    : Format == D3DFMT_D24FS8              ? "D3DFMT_D24FS8             "
+    : Format == D3DFMT_D32_LOCKABLE        ? "D3DFMT_D32_LOCKABLE       "
+    : Format == D3DFMT_S8_LOCKABLE         ? "D3DFMT_S8_LOCKABLE        "
+    : Format == D3DFMT_L16                 ? "D3DFMT_L16                "
+    : Format == D3DFMT_VERTEXDATA          ? "D3DFMT_VERTEXDATA         "
+    : Format == D3DFMT_INDEX16             ? "D3DFMT_INDEX16            "
+    : Format == D3DFMT_INDEX32             ? "D3DFMT_INDEX32            "
+    : Format == D3DFMT_Q16W16V16U16        ? "D3DFMT_Q16W16V16U16       "
+    : Format == D3DFMT_MULTI2_ARGB8        ? "D3DFMT_MULTI2_ARGB8       "
+    : Format == D3DFMT_R16F                ? "D3DFMT_R16F               "
+    : Format == D3DFMT_G16R16F             ? "D3DFMT_G16R16F            "
+    : Format == D3DFMT_A16B16G16R16F       ? "D3DFMT_A16B16G16R16F      "
+    : Format == D3DFMT_R32F                ? "D3DFMT_R32F               "
+    : Format == D3DFMT_G32R32F             ? "D3DFMT_G32R32F            "
+    : Format == D3DFMT_A32B32G32R32F       ? "D3DFMT_A32B32G32R32F      "
+    : Format == D3DFMT_CxV8U8              ? "D3DFMT_CxV8U8             "
+    : Format == D3DFMT_A1                  ? "D3DFMT_A1                 "
+    : Format == D3DFMT_A2B10G10R10_XR_BIAS ? "D3DFMT_A2B10G10R10_XR_BIAS"
+    : Format == D3DFMT_BINARYBUFFER        ? "D3DFMT_BINARYBUFFER       "
     : "wth";
   }
 
-
-  D3DFORMAT D3DFMT_UpgradeHelper(
-    const std::string format,
-    const D3DFORMAT   originalFormat,
-    const bool        isSwapchainFormat)
+  bool IsSensibleFormatUpgrade(
+    const D3DFORMAT OriginalFormat,
+    const D3DFORMAT UpgradedFormat)
   {
-    D3DFORMAT upgradedFormat;
+    if ((OriginalFormat == D3DFMT_A2B10G10R10 || OriginalFormat == D3DFMT_A2R10G10B10)
+     && UpgradedFormat < D3DFMT_A16B16G16R16) {
+      return false;
+    }
+    else if (OriginalFormat == D3DFMT_A16B16G16R16 && UpgradedFormat < D3DFMT_A16B16G16R16F) {
+      return false;
+    }
+    else if (OriginalFormat == D3DFMT_A16B16G16R16F && UpgradedFormat < D3DFMT_A32B32G32R32F) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
 
-#define GET_FMT_UPGRADE(if_, targetFormat, upgradedD3DFMT) \
-          if_ (format == targetFormat                      \
-            && upgradedD3DFMT > originalFormat)            \
-          {                                                \
-            upgradedFormat = upgradedD3DFMT;               \
+  void D3DFORMAT_UpgradeHelper(
+    const std::string                 Format,
+    const D3DFORMAT                   OriginalFormat,
+          std::array<D3DFORMAT, 200>* pFormatUpgradeArray)
+  {
+
+#define GET_FORMAT_UPGRADE(if_, TargetFormat, UpgradedD3DFormat)                                              \
+          if_ (Format == TargetFormat                                                                         \
+            && IsSensibleFormatUpgrade(OriginalFormat, UpgradedD3DFormat))                                    \
+          {                                                                                                   \
+            pFormatUpgradeArray->at(static_cast<unsigned long long int>(OriginalFormat)) = UpgradedD3DFormat; \
           }
 
-    GET_FMT_UPGRADE(if,      "rgb10a2", D3DFMT_A2B10G10R10)
-    GET_FMT_UPGRADE(else if, "bgr10a2", D3DFMT_A2R10G10B10)
-    GET_FMT_UPGRADE(else if, "rgba16",  D3DFMT_A16B16G16R16)
-    GET_FMT_UPGRADE(else if, "rgba16f", D3DFMT_A16B16G16R16F)
-    GET_FMT_UPGRADE(else if, "rgba32f", D3DFMT_A32B32G32R32F)
+    GET_FORMAT_UPGRADE(if,      "rgb10a2_unorm", D3DFMT_A2B10G10R10)
+    GET_FORMAT_UPGRADE(else if, "bgr10a2_unorm", D3DFMT_A2R10G10B10)
+    GET_FORMAT_UPGRADE(else if, "rgba16_unorm",  D3DFMT_A16B16G16R16)
+    GET_FORMAT_UPGRADE(else if, "rgba16_float",  D3DFMT_A16B16G16R16F)
+    GET_FORMAT_UPGRADE(else if, "rgba32_float",  D3DFMT_A32B32G32R32F)
     else {
       Logger::info(str::format("D3D9: render target upgrade disabled for: ",
-                   GetD3DFormatAsString(originalFormat)));
-      return originalFormat;
+                   GetD3DFormatAsString(OriginalFormat)));
+      return;
     }
 
-    if (!isSwapchainFormat) {
-      Logger::info(str::format("D3D9: render target upgrade enabled for:  ",
-                               GetD3DFormatAsString(originalFormat),
-                               " -> ",
-                               GetD3DFormatAsString(upgradedFormat)));
-      return upgradedFormat;
-    }
-    else if (isSwapchainFormat) {
-      if (upgradedFormat == D3DFMT_A32B32G32R32F) {
-        upgradedFormat = D3DFMT_A16B16G16R16F;
-      }
-      Logger::info(str::format("D3D9: render target upgrade enabled for:  ",
-                               GetD3DFormatAsString(originalFormat),
-                               " -> ",
-                               GetD3DFormatAsString(upgradedFormat)));
-      return upgradedFormat;
-    }
-    else {
-      Logger::info(str::format("D3D9: render target upgrade disabled for: ",
-                               GetD3DFormatAsString(originalFormat)));
-      return originalFormat;
-    }
+    Logger::info(str::format("D3D9: render target upgrade enabled for:  ",
+                             GetD3DFormatAsString(OriginalFormat),
+                             " -> ",
+                             GetD3DFormatAsString(pFormatUpgradeArray->at(static_cast<unsigned long long int>(OriginalFormat)))));
+    return;
 
-
-#undef CHECK_FMT_UPGRADE
+#undef GET_FORMAT_UPGRADE
 
   }
 
-  VkFormat VkFormat_UpgradeHelper(const std::string format)
+  D3DFORMAT BackBufferFormatUpgradeHelper(const std::string Format)
   {
-    VkFormat upgradedFormat;
-    if (format == "rgb10a2") {
-      upgradedFormat = VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+    D3DFORMAT upgradedFormat;
+    if (Format == "rgb10a2_unorm") {
+      upgradedFormat = D3DFMT_A2B10G10R10;
     }
-    else if (format == "bgr10a2") {
-      upgradedFormat = VK_FORMAT_A2R10G10B10_UNORM_PACK32;
+    else if (Format == "bgr10a2_unorm") {
+      upgradedFormat = D3DFMT_A2R10G10B10;
     }
-    else if (format == "rgba16") {
-      upgradedFormat = VK_FORMAT_R16G16B16A16_UNORM;
+    else if (Format == "rgba16_unorm") {
+      upgradedFormat = D3DFMT_A16B16G16R16;
     }
-    else if (format == "rgba16f") {
-      upgradedFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
-    }
-    else {
-      upgradedFormat = VK_FORMAT_UNDEFINED;
-    }
-    if (upgradedFormat != VK_FORMAT_UNDEFINED) {
-      Logger::info(str::format("D3D9: swapchain format will be upgraded to: ",
-                               upgradedFormat));
+    else if (Format == "rgba16_float") {
+      upgradedFormat = D3DFMT_A16B16G16R16F;
     }
     else {
-      Logger::info("D3D9: swapchain format upgrade disabled");
+      upgradedFormat = D3DFMT_UNKNOWN;
+    }
+    if (upgradedFormat != D3DFMT_UNKNOWN) {
+      Logger::info(str::format("D3D9: back buffer format will be upgraded to: ",
+                               GetD3DFormatAsString(upgradedFormat)));
+    }
+    else {
+      Logger::info("D3D9: back buffer format upgrade disabled");
     }
     return upgradedFormat;
   }
 
-  VkColorSpaceKHR VkColorSpace_UpgradeHelper(const std::string colorSpace)
+  VkFormat VkFormat_UpgradeHelper(const std::string Format)
   {
-    VkColorSpaceKHR upgradeColorspace;
-    if (colorSpace == "bt709_non_linear") {
-      upgradeColorspace = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
+    VkFormat upgradedFormat;
+    if (Format == "rgba8_unorm") {
+      upgradedFormat = VK_FORMAT_R8G8B8A8_UNORM;
     }
-    else if (colorSpace == "pq") {
-      upgradeColorspace = VK_COLOR_SPACE_HDR10_ST2084_EXT;
+    else if (Format == "bgra8_unorm") {
+      upgradedFormat = VK_FORMAT_B8G8R8A8_UNORM;
     }
-    else if (colorSpace == "bt2020_linear") {
-      upgradeColorspace = VK_COLOR_SPACE_BT2020_LINEAR_EXT;
+    else if (Format == "rgb10a2_unorm") {
+      upgradedFormat = VK_FORMAT_A2B10G10R10_UNORM_PACK32;
     }
-    else if (colorSpace == "scrgb") {
-      upgradeColorspace = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+    else if (Format == "bgr10a2_unorm") {
+      upgradedFormat = VK_FORMAT_A2R10G10B10_UNORM_PACK32;
+    }
+    else if (Format == "rgba16_unorm") {
+      upgradedFormat = VK_FORMAT_R16G16B16A16_UNORM;
+    }
+    else if (Format == "rgba16_float") {
+      upgradedFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+    }
+    else if (Format == "unchanged") {
+      upgradedFormat = VK_FORMAT_MAX_ENUM;
     }
     else {
-      upgradeColorspace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+      upgradedFormat = VK_FORMAT_UNDEFINED;
     }
-    if (upgradeColorspace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-      Logger::info(str::format("D3D9: swapchain colorspace will be upgraded to: ",
-                               upgradeColorspace));
+    if (upgradedFormat == VK_FORMAT_MAX_ENUM) {
+      Logger::info("DXVK (D3D9): swap chain format will stay unchanged");
+    }
+    else if (upgradedFormat != VK_FORMAT_UNDEFINED) {
+      Logger::info(str::format("DXVK (D3D9): swap chain format will be upgraded to:      ",
+                               upgradedFormat));
     }
     else {
-      Logger::info("D3D9: swapchain colorspace upgrade disabled");
+      Logger::info("DXVK (D3D9): swap chain format upgrade disabled");
     }
-    return upgradeColorspace;
+    return upgradedFormat;
+  }
+
+  VkColorSpaceKHR VkColorSpace_UpgradeHelper(const std::string ColorSpace)
+  {
+    VkColorSpaceKHR upgradedColorSpace;
+    if (ColorSpace == "bt709_non_linear") {
+      upgradedColorSpace = VK_COLOR_SPACE_BT709_NONLINEAR_EXT;
+    }
+    else if (ColorSpace == "pq") {
+      upgradedColorSpace = VK_COLOR_SPACE_HDR10_ST2084_EXT;
+    }
+    else if (ColorSpace == "bt2020_linear") {
+      upgradedColorSpace = VK_COLOR_SPACE_BT2020_LINEAR_EXT;
+    }
+    else if (ColorSpace == "scrgb") {
+      upgradedColorSpace = VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT;
+    }
+    else if (ColorSpace == "unchanged") {
+      upgradedColorSpace = VK_COLOR_SPACE_PASS_THROUGH_EXT;
+    }
+    else {
+      upgradedColorSpace = VK_COLOR_SPACE_MAX_ENUM_KHR;
+    }
+    if (upgradedColorSpace == VK_COLOR_SPACE_PASS_THROUGH_EXT) {
+      Logger::info("DXVK (D3D9): swap chain color space will stay unchanged");
+    }
+    else if (upgradedColorSpace != VK_COLOR_SPACE_MAX_ENUM_KHR) {
+      Logger::info(str::format("DXVK (D3D9): swap chain color space will be upgraded to: ",
+                               upgradedColorSpace));
+    }
+    else {
+      Logger::info("DXVK (D3D9): swap chain color space upgrade disabled");
+    }
+    return upgradedColorSpace;
   }
 
 #if defined(_MSC_VER)
@@ -192,12 +237,14 @@ namespace dxvk {
 #else
   WINBOOL
 #endif
-          D3D9_WindowModeHelper(const std::string windowMode)
+          D3D9_WindowModeHelper(const std::string WindowMode)
   {
-    if (windowMode == "windowed")
+    if (WindowMode == "windowed") {
       return TRUE;
-    else
+    }
+    else {
       return FALSE;
+    }
   }
   //HDR-mod helpers end
 
@@ -272,57 +319,48 @@ namespace dxvk {
     this->textureMemory                 = config.getOption<int32_t>     ("d3d9.textureMemory",                 100) << 20;
     this->deviceLost                    = config.getOption<bool>        ("d3d9.deviceLost",                    false);
 
-    //HDR-mod start
-    this->enableRenderTargetUpgrade            = config.getOption<bool> ("d3d9.enableRenderTargetUpgrade",            false);
-    this->enableSwapchainUpgrade               = config.getOption<bool> ("d3d9.enableSwapchainUpgrade",               false);
-    this->enableSwapchainFormatUpgradeInternal = config.getOption<bool> ("d3d9.enableSwapchainFormatUpgradeInternal", false);
-    this->logRenderTargetFormatsUsed           = config.getOption<bool> ("d3d9.logRenderTargetFormatsUsed",           false);
-    this->logFormatsUsed                       = config.getOption<bool> ("d3d9.logFormatsUsed",                       false);
+    //HDR-mod options start
+    this->enableRenderTargetUpgrades    = config.getOption<bool> ("d3d9.enableRenderTargetUpgrades",    false);
+    this->enableBackBufferFormatUpgrade = config.getOption<bool> ("d3d9.enableBackBufferFormatUpgrade", false);
+    this->enableSwapChainUpgrade        = config.getOption<bool> ("d3d9.enableSwapChainUpgrade",        false);
+    this->logRenderTargetFormatsUsed    = config.getOption<bool> ("d3d9.logRenderTargetFormatsUsed",    false);
 
 
-    this->upgradeSwapchainFormatTo =
-      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatTo", "rgba16f")));
-    this->upgradeSwapchainColorSpaceTo =
-      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainColorSpaceTo", "scRGB")));
-    if (this->upgradeSwapchainFormatTo     == VK_FORMAT_UNDEFINED
-     || this->upgradeSwapchainColorSpaceTo == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-      Logger::info("D3D9: swapchain upgrade disabled");
-      this->enableSwapchainUpgrade = false;
+    this->upgradeBackBufferFormatTo =
+      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeBackBufferFormatTo", "disabled")));
+    if (this->upgradeBackBufferFormatTo == D3DFMT_UNKNOWN) {
+      this->enableBackBufferFormatUpgrade = false;
+    }
+
+    this->upgradeSwapChainFormatTo =
+      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "rgba16f")));
+    this->upgradeSwapChainColorSpaceTo =
+      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "scRGB")));
+    if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
+     || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
+      Logger::info("DXVK (D3D9): swap chain upgrade disabled");
+      this->enableSwapChainUpgrade = false;
     }
 
 
-    this->upgradeSwapchainFormatInternalTo =
-      D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapchainFormatInternalTo", "disabled")),
-                           D3DFMT_UNKNOWN,
-                           true);
-    if (this->upgradeSwapchainFormatInternalTo == D3DFMT_UNKNOWN) {
-      this->enableSwapchainFormatUpgradeInternal = false;
-    }
+  this->formatUpgradeArray.fill( { D3DFMT_UNKNOWN } );
 
+#define D3DFORMAT_UPGRADE_HELPER(CfgString, OriginalFormat)                                                          \
+          D3DFORMAT_UpgradeHelper(                                                                                   \
+            Config::toLower(config.getOption<std::string>("d3d9.upgrade_" CfgString "_renderTargetTo", "disabled")), \
+            OriginalFormat,                                                                                          \
+            &this->formatUpgradeArray)
 
-#define D3DFMT_UPGRADE_HELPER(cfgString, originalFormat)                                                                    \
-          D3DFMT_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgrade_" cfgString "_To", "disabled")), \
-                               originalFormat,                                                                              \
-                               false)
+    D3DFORMAT_UPGRADE_HELPER("RGBA8_UNORM",   D3DFMT_A8B8G8R8);
+    D3DFORMAT_UPGRADE_HELPER("RGBX8_UNORM",   D3DFMT_X8B8G8R8);
+    D3DFORMAT_UPGRADE_HELPER("BGRA8_UNORM",   D3DFMT_A8R8G8B8);
+    D3DFORMAT_UPGRADE_HELPER("BGRX8_UNORM",   D3DFMT_X8R8G8B8);
+    D3DFORMAT_UPGRADE_HELPER("RGB10A2_UNORM", D3DFMT_A2B10G10R10);
+    D3DFORMAT_UPGRADE_HELPER("BGR10A2_UNORM", D3DFMT_A2R10G10B10);
+    D3DFORMAT_UPGRADE_HELPER("RGBA16_UNORM",  D3DFMT_A16B16G16R16);
+    D3DFORMAT_UPGRADE_HELPER("RGBA16_FLOAT",  D3DFMT_A16B16G16R16F);
 
-    this->upgrade_RGBA8_To =
-      D3DFMT_UPGRADE_HELPER("RGBA8",   D3DFMT_A8B8G8R8);
-    this->upgrade_RGBX8_To =
-      D3DFMT_UPGRADE_HELPER("RGBX8",   D3DFMT_X8B8G8R8);
-    this->upgrade_BGRA8_To =
-      D3DFMT_UPGRADE_HELPER("BGRA8",   D3DFMT_A8R8G8B8);
-    this->upgrade_BGRX8_To =
-      D3DFMT_UPGRADE_HELPER("BGRX8",   D3DFMT_X8R8G8B8);
-    this->upgrade_RGB10A2_To =
-      D3DFMT_UPGRADE_HELPER("RGB10A2", D3DFMT_A2B10G10R10);
-    this->upgrade_BGR10A2_To =
-      D3DFMT_UPGRADE_HELPER("BGR10A2", D3DFMT_A2R10G10B10);
-    this->upgrade_RGBA16_To =
-      D3DFMT_UPGRADE_HELPER("RGBA16",  D3DFMT_A16B16G16R16);
-    this->upgrade_RGBA16F_To =
-      D3DFMT_UPGRADE_HELPER("RGBA16F", D3DFMT_A16B16G16R16F);
-
-#undef D3DFMT_UPGRADE_HELPER
+#undef D3DFORMAT_UPGRADE_HELPER
 
     std::string strEnforceWindowModeInternally =
       Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
@@ -331,13 +369,13 @@ namespace dxvk {
       this->enforceWindowModeInternally = true;
       Logger::info(str::format("D3D9: ",
                                strEnforceWindowModeInternally,
-                               "will be enforced"));
+                               "mode will be enforced"));
     }
     else {
       this->enforceWindowModeInternally = false;
     }
     this->enforcedWindowModeInternally = D3D9_WindowModeHelper(strEnforceWindowModeInternally);
-    //HDR-mod end
+    //HDR-mod options end
 
 
     std::string floatEmulation = Config::toLower(config.getOption<std::string>("d3d9.floatEmulation", "auto"));

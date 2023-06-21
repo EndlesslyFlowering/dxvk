@@ -102,12 +102,12 @@ extern "C" {
   }
 
   DLLEXPORT bool __stdcall DXVK_D3D9_HDR_DisableRenderTargetUpgrade() {
-      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrade = true;
+      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrades = true;
       return true;
   }
 
   DLLEXPORT bool __stdcall DXVK_D3D9_HDR_EnableRenderTargetUpgrade() {
-      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrade = false;
+      dxvk::D3D9CommonTexture::forceDisableRenderTargetUpgrades = false;
       return true;
   }
 
