@@ -10,36 +10,45 @@
 
 namespace dxvk {
 
-  bool D3D9CommonTexture::forceDisableRenderTargetUpgrade = false;
+  bool D3D9CommonTexture::forceDisableRenderTargetUpgrades = false;
 
-  void D3D9CommonTexture::FormatLogger(
-          D3D9Format* Format,
-          bool        isRt)
+  void D3D9CommonTexture::RenderTargetFormatLogger(
+    const D3D9Format OriginalFormat,
+    const D3D9Format UpgradedFormat,
+    const bool       IsBackBuffer)
   {
-    if (m_device->GetOptions()->logRenderTargetFormatsUsed && isRt)
+    if (m_device->GetOptions()->logRenderTargetFormatsUsed)
     {
-      Logger::info(str::format("D3D9: used render target format: ", Format));
-    }
-    else if (m_device->GetOptions()->logFormatsUsed)
-    {
-      Logger::info(str::format("D3D9: used D3D9 format:          ", Format));
-    }
-  }
+      bool isUpgraded = UpgradedFormat != OriginalFormat
+                     && UpgradedFormat != D3D9Format::Unknown;
 
-  void D3D9CommonTexture::RtUpgradeLogger(
-          D3D9Format* originalFormat,
-    const D3D9Format* upgradedFormat)
-  {
-    if (*originalFormat == *upgradedFormat)
-    {
-      FormatLogger(originalFormat, true);
+      std::string logString;
+
+      if (unlikely(IsBackBuffer)) {
+        logString = ("back buffer");
+      }
+      else {
+        logString = ("render target");
+      }
+
+      if (isUpgraded) {
+        Logger::info(str::format("D3D9: ",
+                                 logString.c_str(),
+                                 !IsBackBuffer ? " format upgraded: " : " format upgraded:   ",
+                                 OriginalFormat,
+                                 " -> ",
+                                 UpgradedFormat));
+      }
+      else {
+        Logger::info(str::format("D3D9: used ",
+                                 logString.c_str(),
+                                 !IsBackBuffer ? ":     " : ":       ",
+                                 OriginalFormat));
+      }
+      return;
     }
-    else if (m_device->GetOptions()->logRenderTargetFormatsUsed)
-    {
-      Logger::info(str::format("D3D9: render target upgrade:     ",
-                               *originalFormat,
-                               " -> ",
-                               *upgradedFormat));
+    else {
+      return;
     }
   }
 
@@ -73,83 +82,50 @@ namespace dxvk {
     }
 
 
-#define RT_UPGRADE_HELPER(format)                                                       \
-          const D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->format); \
-          m_mapping = ConvertFormatUnfixed(upgradedFormat);                             \
-          RtUpgradeLogger(&m_desc.Format, &upgradedFormat);                             \
-          break
-
-#define DEFAULT_FORMAT_MAPPING(isRt)                        \
-          m_mapping = pDevice->LookupFormat(m_desc.Format); \
-          FormatLogger(&m_desc.Format, isRt)
-
-
-    if (m_desc.Usage & D3DUSAGE_RENDERTARGET)
+    if (unlikely(m_desc.IsBackBuffer))
     {
-      if (m_device->GetOptions()->enableRenderTargetUpgrade
-       && !forceDisableRenderTargetUpgrade)
+      if (m_device->GetOptions()->enableBackBufferFormatUpgrade
+       && !forceDisableRenderTargetUpgrades)
       {
-        switch(m_desc.Format)
-        {
-          case D3D9Format::A8B8G8R8: // RGBA8
-          {
-            RT_UPGRADE_HELPER(upgrade_RGBA8_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::X8B8G8R8: // RGBX8
-          {
-            RT_UPGRADE_HELPER(upgrade_RGBX8_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::A8R8G8B8: // BGRA8
-          {
-            RT_UPGRADE_HELPER(upgrade_BGRA8_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::X8R8G8B8: // BGRX8
-          {
-            RT_UPGRADE_HELPER(upgrade_BGRX8_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::A2B10G10R10: // RGB10A2
-          {
-            RT_UPGRADE_HELPER(upgrade_RGB10A2_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::A2R10G10B10: // BGR10A2
-          {
-            RT_UPGRADE_HELPER(upgrade_BGR10A2_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::A16B16G16R16: // RGBA16
-          {
-            RT_UPGRADE_HELPER(upgrade_RGBA16_To);
-          }
-          [[fallthrough]];
-          case D3D9Format::A16B16G16R16F: // RGBA16F
-          {
-            RT_UPGRADE_HELPER(upgrade_RGBA16F_To);
-          }
-          [[fallthrough]];
-          default:
-          {
-            DEFAULT_FORMAT_MAPPING(true);
-            break;
-          }
+        if (IsSensibleFormatUpgrade(static_cast<D3DFORMAT>(m_desc.Format), m_device->GetOptions()->upgradeBackBufferFormatTo)) {
+          const D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->upgradeBackBufferFormatTo);
+          m_mapping = pDevice->LookupFormat(upgradedFormat);
+          RenderTargetFormatLogger(m_desc.Format, upgradedFormat, true);
         }
       }
       else
       {
-        DEFAULT_FORMAT_MAPPING(true);
+        m_mapping = pDevice->LookupFormat(m_desc.Format);
+        RenderTargetFormatLogger(m_desc.Format, D3D9Format::Unknown, true);
       }
     }
-    else {
-      DEFAULT_FORMAT_MAPPING(false);
+    else if (m_desc.Usage & D3DUSAGE_RENDERTARGET)
+    {
+      if (m_device->GetOptions()->enableRenderTargetUpgrades
+       && !forceDisableRenderTargetUpgrades)
+      {
+        const D3D9Format upgradedFormat =
+          D3D9Format(m_device->GetOptions()->formatUpgradeArray.at(static_cast<unsigned long long int>(m_desc.Format)));
+
+        if (upgradedFormat != D3D9Format::Unknown) {
+          m_mapping = pDevice->LookupFormat(upgradedFormat);
+          RenderTargetFormatLogger(m_desc.Format, upgradedFormat);
+        }
+        else {
+          m_mapping = pDevice->LookupFormat(m_desc.Format);
+          RenderTargetFormatLogger(m_desc.Format);
+        }
+      }
+      else
+      {
+        m_mapping = pDevice->LookupFormat(m_desc.Format);
+        RenderTargetFormatLogger(m_desc.Format);
+      }
     }
-
-
-#undef RT_UPGRADE_HELPER
-#undef DEFAULT_FORMAT_MAPPING
+    else
+    {
+      m_mapping = pDevice->LookupFormat(m_desc.Format);
+    }
 
 
     m_mapMode        = DetermineMapMode();
