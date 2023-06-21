@@ -482,17 +482,14 @@ namespace dxvk {
 
     ID3D9VkInteropTexture* GetVkInterop() { return &m_d3d9Interop; }
 
-    static bool forceDisableRenderTargetUpgrade;
+    static bool forceDisableRenderTargetUpgrades;
 
   private:
 
-    void FormatLogger(
-            D3D9Format* Format,
-            bool        isRt);
-
-    void RtUpgradeLogger(
-            D3D9Format* originalFormat,
-      const D3D9Format* upgradedFormat);
+    void RenderTargetFormatLogger(
+      const D3D9Format OriginalFormat,
+      const D3D9Format UpgradedFormat = D3D9Format::Unknown,
+      const bool       IsBackBuffer   = false);
 
     D3D9DeviceEx*                 m_device;
     D3D9_COMMON_TEXTURE_DESC      m_desc;
