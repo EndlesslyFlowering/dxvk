@@ -4,7 +4,7 @@
 
 namespace dxvk {
 
-  class D3D11FormatUpgradeHelper {
+  class D3D11RenderTargetUpgradeHelper {
 
   public:
 
