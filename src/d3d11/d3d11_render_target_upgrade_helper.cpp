@@ -1,8 +1,8 @@
-#include "d3d11_format_upgrade_helper.h"
+#include "d3d11_render_target_upgrade_helper.h"
 
 namespace dxvk {
 
-  DXGI_FORMAT D3D11FormatUpgradeHelper::UpgradeFormat(
+  DXGI_FORMAT D3D11RenderTargetUpgradeHelper::UpgradeFormat(
           DXGI_FORMAT         OriginalFormat,
           DXGI_FORMAT         UpgradedFormat,
           FORMAT_UPGRADE_TYPE UpgradeType,
