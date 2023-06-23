@@ -143,7 +143,7 @@ namespace dxvk {
     bool exposeDriverCommandLists;
 
     /// enable render target upgrades
-    bool enableRenderTargetUpgrade;
+    bool enableRenderTargetUpgrades;
 
     /// array that describes which format will be ugprade to which
     std::array<FormatUpgradeInfo, 116> formatUpgradeInfoArray =

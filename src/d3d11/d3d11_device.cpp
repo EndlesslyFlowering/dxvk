@@ -19,7 +19,7 @@
 #include "d3d11_interop.h"
 #include "d3d11_query.h"
 #include "d3d11_resource.h"
-#include "d3d11_format_upgrade_helper.h"
+#include "d3d11_render_target_upgrade_helper.h"
 #include "d3d11_sampler.h"
 #include "d3d11_shader.h"
 #include "d3d11_state_object.h"
@@ -369,26 +369,26 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-      if (m_d3d11Options.enableRenderTargetUpgrade
-       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-      else if (m_d3d11Options.enableBackBufferFormatUpgrade
-            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.upgradeBackBufferFormatTo,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-
       if (FAILED(D3D11ShaderResourceView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
+    }
+
+    if (m_d3d11Options.enableRenderTargetUpgrades
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
+    }
+    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
     }
 
     uint32_t plane = D3D11ShaderResourceView::GetPlaneSlice(&desc);
@@ -466,26 +466,26 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-      if (m_d3d11Options.enableRenderTargetUpgrade
-       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-      else if (m_d3d11Options.enableBackBufferFormatUpgrade
-            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.upgradeBackBufferFormatTo,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-
       if (FAILED(D3D11UnorderedAccessView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
+    }
+
+    if (m_d3d11Options.enableRenderTargetUpgrades
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
+    }
+    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
     }
     
     uint32_t plane = D3D11UnorderedAccessView::GetPlaneSlice(&desc);
@@ -571,26 +571,26 @@ namespace dxvk {
     } else {
       desc = *pDesc;
 
-      if (m_d3d11Options.enableRenderTargetUpgrade
-       && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-       && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-      else if (m_d3d11Options.enableBackBufferFormatUpgrade
-            && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-        desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
-                        desc.Format,
-                        m_d3d11Options.upgradeBackBufferFormatTo,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW,
-                        m_d3d11Options.logRenderTargetFormatsUsed);
-      }
-
       if (FAILED(D3D11RenderTargetView::NormalizeDesc(pResource, &desc)))
         return E_INVALIDARG;
+    }
+
+    if (m_d3d11Options.enableRenderTargetUpgrades
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
+     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
+    }
+    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
+      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
+                      desc.Format,
+                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW,
+                      m_d3d11Options.logRenderTargetFormatsUsed);
     }
     
     uint32_t plane = D3D11RenderTargetView::GetPlaneSlice(&desc);
