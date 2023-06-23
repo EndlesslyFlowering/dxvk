@@ -3,8 +3,7 @@
 ***DO NOT*** **mistake this for the original [dxvk](https://github.com/doitsujin/dxvk)!**
 
 **This independent modification allows for upgrading the internal render targets' formats to higher bit depth variants and changing the swapchain format and color space for possible HDR output or just visual improvements.**\
-**Only D3D9 is supported!**\
-**Online usage is discouraged due to modifications of how this mod handles D3D9.**
+**Online usage is discouraged due to modifications of how this mod handles D3D.**
 
 For further explanations check [here](HDR-mod.md).
 
