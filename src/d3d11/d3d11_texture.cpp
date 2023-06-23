@@ -1,6 +1,6 @@
 #include "d3d11_device.h"
 #include "d3d11_gdi.h"
-#include "d3d11_format_upgrade_helper.h"
+#include "d3d11_render_target_upgrade_helper.h"
 #include "d3d11_texture.h"
 
 #include "../util/util_shared_res.h"
@@ -21,21 +21,21 @@ namespace dxvk {
     m_11on12(p11on12Info ? *p11on12Info : D3D11_ON_12_RESOURCE_INFO()), m_dxgiUsage(DxgiUsage) {
     DXGI_VK_FORMAT_MODE   formatMode   = GetFormatMode();
 
-    if (m_device->GetOptions()->enableRenderTargetUpgrade
+    if (m_device->GetOptions()->enableRenderTargetUpgrades
      && formatMode == DXGI_VK_FORMAT_MODE_COLOR // DXGI_VK_FORMAT_MODE_COLOR == render target
      && !(m_dxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-      m_desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+      m_desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                         m_desc.Format,
                         m_device->GetOptions()->formatUpgradeInfoArray[m_desc.Format].upgradedFormat,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET,
+                        D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET,
                         m_device->GetOptions()->logRenderTargetFormatsUsed);
     }
     else if (m_device->GetOptions()->enableBackBufferFormatUpgrade
           && m_dxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-      m_desc.Format = D3D11FormatUpgradeHelper::UpgradeFormat(
+      m_desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                         m_desc.Format,
                         m_device->GetOptions()->upgradeBackBufferFormatTo,
-                        D3D11FormatUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER,
+                        D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER,
                         m_device->GetOptions()->logRenderTargetFormatsUsed);
     }
 
