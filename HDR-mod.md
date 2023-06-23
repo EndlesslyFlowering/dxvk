@@ -31,7 +31,7 @@ All options are also explained in the default [dxvk.conf](dxvk.conf)!
 Yes these work for both d3d10 and d3d11 games!
 ---
 
-### [Example usage](#Example-usage)
+### [Example usage](#Example-usage-1)
 
 ---
 
@@ -50,7 +50,7 @@ Check [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11) for the i
 Individual render target upgrades per format.\
 These may cause visual issues. Check [logRenderTargetFormatsUsed](#logRenderTargetFormatsUsed-d3d9d3d11) to fix those.
 
-Setting `upgrade_***_renderTargetTo = rgba16_float` / `upgrade_***_renderTargetTo = rgba16_float` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
+Setting `upgrade_***_renderTargetTo = rgba16_float` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
 This needs '[upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11) = rgba16_float' and '[upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11) = scRGB' otherwise they are lost again.\
 Additionally further post processing is needed to display the game correctly.
 
@@ -217,8 +217,8 @@ Set the format with [upgradeBackBufferFormatTo](#upgradeBackBufferFormatTo-d3d9d
 Upgrade the back buffer format to another format.
 Needs '[enableBackBufferFormatUpgrade](#enableBackBufferFormatUpgrade-d3d9d3d11) = True'!
 
-> Supported values: disabled, rgb10a2_unorm, bgr10a2_unorm, rgba16_unorm, rgba16_float, rgba32_float
-> Default/Fallback: disabled
+> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Default/Fallback: `disabled`
 
 ---
 
@@ -337,7 +337,7 @@ See [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11).
 
 - output 'overbright' data (needs further post processing):
     ```ini
-    d3d11.enableRenderTargetUpgrades   			  = true
+    d3d11.enableRenderTargetUpgrades              = true
     d3d11.upgrade_RGBA8_UNORM_renderTargetTo      = rgba16_float
     d3d11.upgrade_BGRA8_UNORM_renderTargetTo      = rgba16_float
     d3d11.upgrade_BGRX8_UNORM_renderTargetTo      = rgba16_float
@@ -360,7 +360,7 @@ See [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11).
 
 - get rid off banding issues:
     ```ini
-    d3d11.enableRenderTargetUpgrades   			  = true
+    d3d11.enableRenderTargetUpgrades              = true
     d3d11.upgrade_RGBA8_UNORM_renderTargetTo      = rgba16_unorm
     d3d11.upgrade_BGRA8_UNORM_renderTargetTo      = rgba16_unorm
     d3d11.upgrade_BGRX8_UNORM_renderTargetTo      = rgba16_unorm
@@ -382,3 +382,4 @@ See [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11).
     on AMD you can use:
     ```ini
     d3d11.upgradeSwapChainFormatTo                = rgba16_unorm
+    ```
