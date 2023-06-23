@@ -346,7 +346,7 @@ namespace dxvk {
     this->tearFree                = config.getOption<Tristate>("dxgi.tearFree", Tristate::Auto);
 
     // HDR-mod options start
-    this->enableRenderTargetUpgrade     = config.getOption<bool>("d3d11.enableRenderTargetUpgrade",     false);
+    this->enableRenderTargetUpgrades    = config.getOption<bool>("d3d11.enableRenderTargetUpgrades",    false);
     this->enableBackBufferFormatUpgrade = config.getOption<bool>("d3d11.enableBackBufferFormatUpgrade", false);
     this->enableSwapChainUpgrade        = config.getOption<bool>("d3d11.enableSwapChainUpgrade",        false);
     this->logRenderTargetFormatsUsed    = config.getOption<bool>("d3d11.logRenderTargetFormatsUsed",    false);
