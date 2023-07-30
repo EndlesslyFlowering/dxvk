@@ -391,17 +391,25 @@ namespace dxvk {
                       m_d3d11Options.logRenderTargetFormatsUsed);
     }
 
+
     uint32_t plane = D3D11ShaderResourceView::GetPlaneSlice(&desc);
     
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_SHADER_RESOURCE, desc.Format, plane)) {
-      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
+      // for d3d10
+      UINT bufferExFlags = 0;
+      try {
+        bufferExFlags = desc.BufferEx.Flags;
+      }
+      catch(const std::exception& e) { }
       Logger::err(str::format("D3D11: Cannot create shader resource view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumeratedBindFlags,
+        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
-        "\n  View plane:      ", plane));
-      free((void*)enumeratedBindFlags);
+        "\n  View plane:      ", plane,
+        "\n  BufferEx flags:  ", bufferExFlags,
+        "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
     
@@ -487,18 +495,20 @@ namespace dxvk {
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW,
                       m_d3d11Options.logRenderTargetFormatsUsed);
     }
-    
+
+
     uint32_t plane = D3D11UnorderedAccessView::GetPlaneSlice(&desc);
 
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_UNORDERED_ACCESS, desc.Format, plane)) {
-      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create unordered access view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumeratedBindFlags,
+        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
-        "\n  View plane:      ", plane));
-      free((void*)enumeratedBindFlags);
+        "\n  View plane:      ", plane,
+        "\n  Buffer flags:    ", desc.Buffer.Flags,
+        "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
 
@@ -592,18 +602,19 @@ namespace dxvk {
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW,
                       m_d3d11Options.logRenderTargetFormatsUsed);
     }
-    
+
+
     uint32_t plane = D3D11RenderTargetView::GetPlaneSlice(&desc);
 
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_RENDER_TARGET, desc.Format, plane)) {
-      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create render target view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumeratedBindFlags,
+        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
-        "\n  View plane:      ", plane));
-      free((void*)enumeratedBindFlags);
+        "\n  View plane:      ", plane,
+        "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
 
@@ -647,13 +658,12 @@ namespace dxvk {
     }
     
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_DEPTH_STENCIL, desc.Format, 0)) {
-      char* enumeratedBindFlags = enumerateD3d11BindFlags(resourceDesc.BindFlags);
       Logger::err(str::format("D3D11: Cannot create depth-stencil view:",
         "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumeratedBindFlags,
+        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format));
-      free((void*)enumeratedBindFlags);
       return E_INVALIDARG;
     }
     
