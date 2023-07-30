@@ -297,7 +297,7 @@ See [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11).
 
 ## logViewsOfRenderTargets (d3d11)
 
-Log information about all view types.
+Log information about all view types of render targets.
 
 > Supported values: `True`, `False`\
 > Default/Fallback: `False`
@@ -388,7 +388,7 @@ Log information about all view types.
     d3d11.upgrade_RGB10A2_TYPELESS_renderTargetTo = rgba16_typeless
     d3d11.upgrade_RG11B10_FLOAT_renderTargetTo    = rgba16_float
     d3d11.enableBackBufferFormatUpgrade           = true
-    d3d11.upgradeBackBufferFormatTo               = rgba10_unorm
+    d3d11.upgradeBackBufferFormatTo               = rgba16_unorm
     d3d11.enableSwapChainUpgrade                  = true
     d3d11.upgradeSwapChainFormatTo                = rgba10_unorm
     d3d11.upgradeSwapChainColorSpaceTo            = unchanged
