@@ -111,14 +111,14 @@ namespace dxvk {
   void D3DFORMAT_UpgradeHelper(
     const std::string                 Format,
     const D3DFORMAT                   OriginalFormat,
-          std::array<D3DFORMAT, 200>* pFormatUpgradeArray)
+          std::array<D3DFORMAT, 120>* pFormatUpgradeArray)
   {
 
 #define GET_FORMAT_UPGRADE(if_, TargetFormat, UpgradedD3DFormat)                                              \
           if_ (Format == TargetFormat                                                                         \
             && IsSensibleFormatUpgrade(OriginalFormat, UpgradedD3DFormat))                                    \
           {                                                                                                   \
-            pFormatUpgradeArray->at(static_cast<unsigned long long int>(OriginalFormat)) = UpgradedD3DFormat; \
+            pFormatUpgradeArray->at(static_cast<size_t>(OriginalFormat)) = UpgradedD3DFormat;                 \
           }
 
     GET_FORMAT_UPGRADE(if,      "rgb10a2_unorm", D3DFMT_A2B10G10R10)
@@ -135,7 +135,7 @@ namespace dxvk {
     Logger::info(str::format("D3D9: render target upgrade enabled for:  ",
                              GetD3DFormatAsString(OriginalFormat),
                              " -> ",
-                             GetD3DFormatAsString(pFormatUpgradeArray->at(static_cast<unsigned long long int>(OriginalFormat)))));
+                             GetD3DFormatAsString(pFormatUpgradeArray->at(static_cast<size_t>(OriginalFormat)))));
     return;
 
 #undef GET_FORMAT_UPGRADE
