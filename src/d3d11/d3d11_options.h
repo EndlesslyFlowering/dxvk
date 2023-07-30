@@ -423,6 +423,9 @@ namespace dxvk {
     /// log formats used
     bool logRenderTargetFormatsUsed;
 
+    /// log all views used
+    bool logViewsOfRenderTargets;
+
     /// Shader dump path
     std::string shaderDumpPath;
 
@@ -431,5 +434,5 @@ namespace dxvk {
     /// can negatively affect performance.
     bool reproducibleCommandStream;
   };
-  
+
 }
