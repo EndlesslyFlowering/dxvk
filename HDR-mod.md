@@ -27,7 +27,8 @@ All options are also explained in the default [dxvk.conf](dxvk.conf)!
 - [d3d11.enableSwapChainUpgrade](#enableSwapChainUpgrade-d3d9d3d11)
 - [d3d11.upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11)
 - [d3d11.upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11)
-- [d3d11.logRenderTargetFormatsUsed](#logRenderTargetFormatsUsed-d3d9d3d11)\
+- [d3d11.logRenderTargetFormatsUsed](#logRenderTargetFormatsUsed-d3d9d3d11)
+- [d3d11.logViewsOfRenderTargets](#logViewsOfRenderTargets-d3d9d3d11)\
 Yes these work for both d3d10 and d3d11 games!
 ---
 
@@ -68,7 +69,11 @@ what option corresponds to what format:
 | RGBA16_UNORM  | `D3DFMT_A16B16G16R16`  | no                             |
 | RGBA16_FLOAT  | `D3DFMT_A16B16G16R16F` | yes                            |
 | RGBA32_FLOAT  | `D3DFMT_A32B32G32R32F` | yes                            |
-
+| B5G6R5_UNORM  | `D3DFMT_R5G6B5`        | no                             |
+| BGR5A1_UNORM  | `D3DFMT_A1R5G5B5`      | no                             |
+| BGR5X1_UNORM  | `D3DFMT_X1R5G5B5`      | no                             |
+| BGRA4_UNORM   | `D3DFMT_A4R4G4B4`      | no                             |
+| BGRX4_UNORM   | `D3DFMT_X4R4G4B4`      | no                             |
 ---
 
 ### d3d11:
@@ -284,6 +289,15 @@ Some games switch between windowed and fullscreen, which might cause issues with
 Log D3D (d3d9) / DXGI (d3d11) render target formats that are being used by the application and the ones that are being upgraded.\
 The main idea is to find render target formats that cause issues and change them to a working one or disable the upgrade.\
 See [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11).
+
+> Supported values: `True`, `False`\
+> Default/Fallback: `False`
+
+---
+
+## logViewsOfRenderTargets (d3d11)
+
+Log information about all view types.
 
 > Supported values: `True`, `False`\
 > Default/Fallback: `False`
