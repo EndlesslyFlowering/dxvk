@@ -77,6 +77,13 @@ namespace dxvk {
       SetAllNeedUpload();
     }
 
+#define DEFAULT_BACK_BUFFER_MAPPING                                          \
+          m_mapping = pDevice->LookupFormat(m_desc.Format);                  \
+          RenderTargetFormatLogger(m_desc.Format, D3D9Format::Unknown, true)
+
+#define DEFAULT_RENDER_TARGET_MAPPING                       \
+          m_mapping = pDevice->LookupFormat(m_desc.Format); \
+          RenderTargetFormatLogger(m_desc.Format)
 
     if (unlikely(m_desc.IsBackBuffer))
     {
@@ -88,11 +95,13 @@ namespace dxvk {
           m_mapping = pDevice->LookupFormat(upgradedFormat);
           RenderTargetFormatLogger(m_desc.Format, upgradedFormat, true);
         }
+        else {
+          DEFAULT_BACK_BUFFER_MAPPING;
+        }
       }
       else
       {
-        m_mapping = pDevice->LookupFormat(m_desc.Format);
-        RenderTargetFormatLogger(m_desc.Format, D3D9Format::Unknown, true);
+        DEFAULT_BACK_BUFFER_MAPPING;
       }
     }
     else if (m_desc.Usage & D3DUSAGE_RENDERTARGET)
@@ -100,22 +109,41 @@ namespace dxvk {
       if (m_device->GetOptions()->enableRenderTargetUpgrades
        && !forceDisableRenderTargetUpgrades)
       {
-        const D3D9Format upgradedFormat =
-          D3D9Format(m_device->GetOptions()->formatUpgradeArray.at(static_cast<unsigned long long int>(m_desc.Format)));
+        try { // d3d9 driver hack formats ffs >:(
+          D3D9Format upgradedFormat =
+            static_cast<D3D9Format>(m_device->GetOptions()->formatUpgradeArray.at(static_cast<size_t>(m_desc.Format)));
 
-        if (upgradedFormat != D3D9Format::Unknown) {
-          m_mapping = pDevice->LookupFormat(upgradedFormat);
-          RenderTargetFormatLogger(m_desc.Format, upgradedFormat);
+          if (upgradedFormat != D3D9Format::Unknown) {
+            m_mapping = pDevice->LookupFormat(upgradedFormat);
+            RenderTargetFormatLogger(m_desc.Format, upgradedFormat);
+          }
+          else {
+            DEFAULT_RENDER_TARGET_MAPPING;
+          }
         }
-        else {
-          m_mapping = pDevice->LookupFormat(m_desc.Format);
-          RenderTargetFormatLogger(m_desc.Format);
+        catch(const std::exception& e) {
+//          uint32_t weirdFormat = static_cast<uint32_t>(m_desc.Format);
+//
+//          char* weirdChars = reinterpret_cast<char*>(&weirdFormat);
+//
+//          char  chars[5] = { ' ', ' ', ' ', ' ', '\0' };
+//          char*   pChars = reinterpret_cast<char*>(&chars);
+//
+//          for (uint32_t i = 0; i < 4; i++) {
+//            *pChars = *weirdChars;
+//            pChars++;
+//            weirdChars++;
+//          }
+//
+//          Logger::info(str::format("D3D9: can't upgrade this format: ",
+//                                   "0x", std::hex, weirdFormat, ": ",
+//                                   chars));
+          DEFAULT_RENDER_TARGET_MAPPING;
         }
       }
       else
       {
-        m_mapping = pDevice->LookupFormat(m_desc.Format);
-        RenderTargetFormatLogger(m_desc.Format);
+        DEFAULT_RENDER_TARGET_MAPPING;
       }
     }
     else
@@ -123,6 +151,8 @@ namespace dxvk {
       m_mapping = pDevice->LookupFormat(m_desc.Format);
     }
 
+#undef DEFAULT_RENDER_TARGET_MAPPING
+#undef DEFAULT_BACK_BUFFER_MAPPING
 
     m_mapMode        = DetermineMapMode();
     m_shadow         = DetermineShadowState();
