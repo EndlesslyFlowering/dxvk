@@ -156,7 +156,7 @@ namespace dxvk {
     bool enableRenderTargetUpgrades;
 
     /// array that describes which format will be ugprade to which
-    std::array<D3DFORMAT, 200> formatUpgradeArray;
+    std::array<D3DFORMAT, 120> formatUpgradeArray;
 
     /// upgrade specific render target formats
     //D3DFORMAT upgrade_RGBA8_UNORM_renderTargetTo;
