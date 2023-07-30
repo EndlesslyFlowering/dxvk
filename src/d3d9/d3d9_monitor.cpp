@@ -6,11 +6,13 @@ namespace dxvk {
 
   uint32_t GetMonitorFormatBpp(D3D9Format Format) {
     switch (Format) {
+    case D3D9Format::A16B16G16R16:
+    case D3D9Format::A16B16G16R16F:
+      return 64;
+
     case D3D9Format::A8R8G8B8:
     case D3D9Format::X8R8G8B8: // This is still 32 bit even though the alpha is unspecified.
     case D3D9Format::A2R10G10B10:
-    case D3D9Format::A16B16G16R16:  // definitely
-    case D3D9Format::A16B16G16R16F: // 32 bit :)
       return 32;
 
     case D3D9Format::A1R5G5B5:
