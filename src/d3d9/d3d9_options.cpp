@@ -145,10 +145,7 @@ namespace dxvk {
   D3DFORMAT BackBufferFormatUpgradeHelper(const std::string Format)
   {
     D3DFORMAT upgradedFormat;
-    if (Format == "rgb10a2_unorm") {
-      upgradedFormat = D3DFMT_A2B10G10R10;
-    }
-    else if (Format == "bgr10a2_unorm") {
+    if (Format == "rgb10a2_unorm" || Format == "bgr10a2_unorm") {
       upgradedFormat = D3DFMT_A2R10G10B10;
     }
     else if (Format == "rgba16_unorm") {
@@ -351,16 +348,6 @@ namespace dxvk {
       this->enableBackBufferFormatUpgrade = false;
     }
 
-    this->upgradeSwapChainFormatTo =
-      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "rgba16f")));
-    this->upgradeSwapChainColorSpaceTo =
-      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "scRGB")));
-    if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
-     || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
-      Logger::info("DXVK (D3D9): swap chain upgrade disabled");
-      this->enableSwapChainUpgrade = false;
-    }
-
 
   this->formatUpgradeArray.fill( { D3DFMT_UNKNOWN } );
 
@@ -386,6 +373,18 @@ namespace dxvk {
 
 #undef D3DFORMAT_UPGRADE_HELPER
 
+
+    this->upgradeSwapChainFormatTo =
+      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "rgba16f")));
+    this->upgradeSwapChainColorSpaceTo =
+      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "scRGB")));
+    if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
+     || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
+      Logger::info("DXVK (D3D9): swap chain upgrade disabled");
+      this->enableSwapChainUpgrade = false;
+    }
+
+
     std::string strEnforceWindowModeInternally =
       Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
     if (strEnforceWindowModeInternally == "windowed"
@@ -393,7 +392,7 @@ namespace dxvk {
       this->enforceWindowModeInternally = true;
       Logger::info(str::format("D3D9: ",
                                strEnforceWindowModeInternally,
-                               "mode will be enforced"));
+                               " mode will be enforced"));
     }
     else {
       this->enforceWindowModeInternally = false;
