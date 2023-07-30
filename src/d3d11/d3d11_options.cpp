@@ -221,6 +221,9 @@ namespace dxvk {
     if (Format == "rgb10a2_unorm") {
       upgradedFormat = DXGI_FORMAT_R10G10B10A2_UNORM;
     }
+    else if (Format == "rgba16_unorm") {
+      upgradedFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
+    }
     else if (Format == "rgba16_float") {
       upgradedFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
     }
