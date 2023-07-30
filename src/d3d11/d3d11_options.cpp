@@ -193,13 +193,13 @@ namespace dxvk {
 
     if(CheckFormatCompatability(OriginalFormat,
                                 UpgradedFormat,
-                                pFormatUpgradeInfoArray->at(OriginalFormat).type,
-                                pFormatUpgradeInfoArray->at(UpgradedFormat).type)) {
+                                pFormatUpgradeInfoArray->at(static_cast<size_t>(OriginalFormat)).type,
+                                pFormatUpgradeInfoArray->at(static_cast<size_t>(UpgradedFormat)).type)) {
       Logger::info(str::format("D3D11: render target upgrade enabled for:  ",
                                GetDXGIFormatNameAsString(OriginalFormat),
                                " -> ",
                                GetDXGIFormatNameAsString(UpgradedFormat)));
-      pFormatUpgradeInfoArray->at(OriginalFormat).upgradedFormat = UpgradedFormat;
+      pFormatUpgradeInfoArray->at(static_cast<size_t>(OriginalFormat)).upgradedFormat = UpgradedFormat;
       return;
     }
     else {
@@ -211,7 +211,7 @@ namespace dxvk {
       return;
     }
 
-#undef CHECK_FMT_UPGRADE
+#undef GET_TARGET_FMT
 
   }
 
