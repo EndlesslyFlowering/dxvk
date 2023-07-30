@@ -106,6 +106,7 @@ namespace dxvk {
       case DXGI_FORMAT_R10G10B10A2_UNORM:
         return 32;
       
+      case DXGI_FORMAT_R16G16B16A16_UNORM:
       case DXGI_FORMAT_R16G16B16A16_FLOAT:
         return 64;
       
