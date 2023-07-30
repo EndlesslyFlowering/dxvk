@@ -57,37 +57,71 @@ std::ostream& operator << (std::ostream& os, D3D11_RTV_DIMENSION e) {
 }
 
 
-#define ENUM_NAME_BIND_FLAG(BindFlag) \
-          if (BindFlags & BindFlag)  \
-            strstr << #BindFlag << " | "
+#define ENUM_NAME_FLAG(Flags, Flag) \
+          if (Flags & Flag)  \
+            strStr << #Flag << " | "
 
-char* enumerateD3d11BindFlags(UINT BindFlags) {
-  std::stringstream strstr;
+std::string enumerateD3d11BindFlags(UINT BindFlags) {
+  std::stringstream strStr;
 
-  strstr << static_cast<int32_t>(BindFlags) << ": ";
+  strStr << static_cast<int32_t>(BindFlags) << ": ";
 
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_INDEX_BUFFER);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_CONSTANT_BUFFER);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_STREAM_OUTPUT);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_RENDER_TARGET);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_DEPTH_STENCIL);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_DECODER);
-  ENUM_NAME_BIND_FLAG(D3D11_BIND_VIDEO_ENCODER);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_VERTEX_BUFFER);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_INDEX_BUFFER);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_CONSTANT_BUFFER);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_SHADER_RESOURCE);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_STREAM_OUTPUT);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_RENDER_TARGET);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_DEPTH_STENCIL);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_UNORDERED_ACCESS);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_DECODER);
+  ENUM_NAME_FLAG(BindFlags, D3D11_BIND_VIDEO_ENCODER);
 
-  strstr.width(267);
+  std::string str = strStr.str();
 
-  std::string str = strstr.str();
+  if (str.length() > 4) {
+    str.resize(str.length() - 3);
+  }
+  else {
+    str.append("none");
+  }
 
-  str.resize(str.size() - 3);
-
-  char* pChar = (char*)malloc(268 * sizeof(char));
-
-  sprintf_s(pChar, 268 * sizeof(char), str.c_str());
-
-  return pChar;
+  return str;
 }
 
-#undef ENUM_NAME_BIND_FLAG
+std::string enumerateD3d11MiscFlags(UINT MiscFlags) {
+  std::stringstream strStr;
+
+  strStr << static_cast<int32_t>(MiscFlags) << ": ";
+
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_GENERATE_MIPS);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_SHARED);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_TEXTURECUBE);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_RESOURCE_CLAMP);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_GDI_COMPATIBLE);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_SHARED_NTHANDLE);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_RESTRICTED_CONTENT);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_RESTRICT_SHARED_RESOURCE_DRIVER);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_GUARDED);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_TILE_POOL);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_TILED);
+  ENUM_NAME_FLAG(MiscFlags, D3D11_RESOURCE_MISC_HW_PROTECTED);
+
+  std::string str = strStr.str();
+
+  if (str.length() > 4) {
+    str.resize(str.length() - 3);
+  }
+  else {
+    str.append("none");
+  }
+
+  return str;
+}
+
+#undef ENUM_NAME_FLAG
