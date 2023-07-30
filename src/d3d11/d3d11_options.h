@@ -426,8 +426,11 @@ namespace dxvk {
     /// log formats used
     bool logRenderTargetFormatsUsed;
 
+    /// log all views used
+    bool logViewsOfRenderTargets;
+
     /// Shader dump path
     std::string shaderDumpPath;
   };
-  
+
 }

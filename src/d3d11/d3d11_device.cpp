@@ -412,6 +412,25 @@ namespace dxvk {
         "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
+
+    if (m_d3d11Options.logViewsOfRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      // for d3d10
+      UINT bufferExFlags = 0;
+      try {
+        bufferExFlags = desc.BufferEx.Flags;
+      }
+      catch(const std::exception& e) { }
+      Logger::info(str::format("D3D11: Shader Resource View of Render Target created:",
+                               "\n  Resource type:   ", resourceDesc.Dim,
+                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+                               "\n  Resource format: ", resourceDesc.Format,
+                               "\n  View format:     ", desc.Format,
+                               "\n  View plane:      ", plane,
+                               "\n  BufferEx flags:  ", bufferExFlags,
+                               "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+    }
     
     if (!ppSRView)
       return S_FALSE;
@@ -510,6 +529,19 @@ namespace dxvk {
         "\n  Buffer flags:    ", desc.Buffer.Flags,
         "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
+    }
+
+    if (m_d3d11Options.logViewsOfRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      Logger::info(str::format("D3D11: Unordered Access View of Render Target created:",
+                               "\n  Resource type:   ", resourceDesc.Dim,
+                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+                               "\n  Resource format: ", resourceDesc.Format,
+                               "\n  View format:     ", desc.Format,
+                               "\n  View plane:      ", plane,
+                               "\n  Buffer flags:    ", desc.Buffer.Flags,
+                               "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
 
     if (!ppUAView)
@@ -618,6 +650,18 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
+    if (m_d3d11Options.logViewsOfRenderTargets
+     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+      Logger::info(str::format("D3D11: Render Target View created:",
+                               "\n  Resource type:   ", resourceDesc.Dim,
+                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+                               "\n  Resource format: ", resourceDesc.Format,
+                               "\n  View format:     ", desc.Format,
+                               "\n  View plane:      ", plane,
+                               "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+    }
+
     if (!ppRTView)
       return S_FALSE;
     
@@ -666,6 +710,15 @@ namespace dxvk {
         "\n  View format:     ", desc.Format));
       return E_INVALIDARG;
     }
+
+//    if (m_d3d11Options.logViewsOfRenderTargets) {
+//      Logger::info(str::format("D3D11: Depth-Stencil View created:",
+//                               "\n  Resource type:   ", resourceDesc.Dim,
+//                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+//                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+//                               "\n  Resource format: ", resourceDesc.Format,
+//                               "\n  View format:     ", desc.Format));
+//    }
     
     if (ppDepthStencilView == nullptr)
       return S_FALSE;
