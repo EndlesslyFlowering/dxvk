@@ -83,19 +83,29 @@ namespace dxvk {
     const D3DFORMAT OriginalFormat,
     const D3DFORMAT UpgradedFormat)
   {
+    bool returnBool = false;
     if ((OriginalFormat == D3DFMT_A2B10G10R10 || OriginalFormat == D3DFMT_A2R10G10B10)
      && UpgradedFormat < D3DFMT_A16B16G16R16) {
-      return false;
+      returnBool = false;
     }
     else if (OriginalFormat == D3DFMT_A16B16G16R16 && UpgradedFormat < D3DFMT_A16B16G16R16F) {
-      return false;
+      returnBool = false;
     }
     else if (OriginalFormat == D3DFMT_A16B16G16R16F && UpgradedFormat < D3DFMT_A32B32G32R32F) {
-      return false;
+      returnBool = false;
     }
     else {
-      return true;
+      returnBool = true;
     }
+
+    if (!returnBool) {
+      Logger::info(str::format("D3D9: it makes no sense to upgrade: ",
+                               GetD3DFormatAsString(OriginalFormat),
+                               " to ",
+                               GetD3DFormatAsString(UpgradedFormat), " !!"));
+    }
+
+    return returnBool;
   }
 
   void D3DFORMAT_UpgradeHelper(
