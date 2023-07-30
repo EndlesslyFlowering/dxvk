@@ -14,4 +14,6 @@ std::ostream& operator << (std::ostream& os, D3D11_USAGE e);
 
 std::ostream& operator << (std::ostream& os, D3D11_RTV_DIMENSION e);
 
-char* enumerateD3d11BindFlags(UINT BindFlags);
+std::string enumerateD3d11BindFlags(UINT BindFlags);
+
+std::string enumerateD3d11MiscFlags(UINT MiscFlags);
