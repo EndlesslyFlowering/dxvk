@@ -395,41 +395,29 @@ namespace dxvk {
     uint32_t plane = D3D11ShaderResourceView::GetPlaneSlice(&desc);
     
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_SHADER_RESOURCE, desc.Format, plane)) {
-      // for d3d10
-      UINT bufferExFlags = 0;
-      try {
-        bufferExFlags = desc.BufferEx.Flags;
-      }
-      catch(const std::exception& e) { }
       Logger::err(str::format("D3D11: Cannot create shader resource view:",
-        "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
-        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
-        "\n  Resource format: ", resourceDesc.Format,
-        "\n  View format:     ", desc.Format,
-        "\n  View plane:      ", plane,
-        "\n  BufferEx flags:  ", bufferExFlags,
-        "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+        "\n  Resource type:    ", resourceDesc.Dim,
+        "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:   ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+        "\n  Resource format:  ", resourceDesc.Format,
+        "\n  View format:      ", desc.Format,
+        "\n  View plane:       ", plane,
+        enumerateD3d11SrvDesc1(&desc),
+        "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
 
     if (m_d3d11Options.logViewsOfRenderTargets
      && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
-      // for d3d10
-      UINT bufferExFlags = 0;
-      try {
-        bufferExFlags = desc.BufferEx.Flags;
-      }
-      catch(const std::exception& e) { }
       Logger::info(str::format("D3D11: Shader Resource View of Render Target created:",
-                               "\n  Resource type:   ", resourceDesc.Dim,
-                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
-                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
-                               "\n  Resource format: ", resourceDesc.Format,
-                               "\n  View format:     ", desc.Format,
-                               "\n  View plane:      ", plane,
-                               "\n  BufferEx flags:  ", bufferExFlags,
-                               "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+                               "\n  Resource type:    ", resourceDesc.Dim,
+                               "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+                               "\n  Resource flags:   ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+                               "\n  Resource format:  ", resourceDesc.Format,
+                               "\n  View format:      ", desc.Format,
+                               "\n  View plane:       ", plane,
+                               enumerateD3d11SrvDesc1(&desc),
+                               "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
     
     if (!ppSRView)
@@ -526,7 +514,7 @@ namespace dxvk {
         "\n  Resource format: ", resourceDesc.Format,
         "\n  View format:     ", desc.Format,
         "\n  View plane:      ", plane,
-        "\n  Buffer flags:    ", desc.Buffer.Flags,
+        enumerateD3d11UavDesc1(&desc),
         "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
@@ -540,7 +528,7 @@ namespace dxvk {
                                "\n  Resource format: ", resourceDesc.Format,
                                "\n  View format:     ", desc.Format,
                                "\n  View plane:      ", plane,
-                               "\n  Buffer flags:    ", desc.Buffer.Flags,
+                               enumerateD3d11UavDesc1(&desc),
                                "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
 
@@ -640,26 +628,28 @@ namespace dxvk {
 
     if (!CheckResourceViewCompatibility(pResource, D3D11_BIND_RENDER_TARGET, desc.Format, plane)) {
       Logger::err(str::format("D3D11: Cannot create render target view:",
-        "\n  Resource type:   ", resourceDesc.Dim,
-        "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
-        "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
-        "\n  Resource format: ", resourceDesc.Format,
-        "\n  View format:     ", desc.Format,
-        "\n  View plane:      ", plane,
-        "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+        "\n  Resource type:    ", resourceDesc.Dim,
+        "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+        "\n  Resource flags:   ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+        "\n  Resource format:  ", resourceDesc.Format,
+        "\n  View format:      ", desc.Format,
+        "\n  View plane:       ", plane,
+        enumerateD3d11RtvDesc1(&desc),
+        "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
       return E_INVALIDARG;
     }
 
     if (m_d3d11Options.logViewsOfRenderTargets
      && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Render Target View created:",
-                               "\n  Resource type:   ", resourceDesc.Dim,
-                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
-                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
-                               "\n  Resource format: ", resourceDesc.Format,
-                               "\n  View format:     ", desc.Format,
-                               "\n  View plane:      ", plane,
-                               "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+                               "\n  Resource type:    ", resourceDesc.Dim,
+                               "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+                               "\n  Resource flags:   ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+                               "\n  Resource format:  ", resourceDesc.Format,
+                               "\n  View format:      ", desc.Format,
+                               "\n  View plane:       ", plane,
+                               enumerateD3d11RtvDesc1(&desc),
+                               "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
 
     if (!ppRTView)
