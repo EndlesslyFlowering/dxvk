@@ -150,10 +150,14 @@ namespace dxvk {
     else if ((OriginalFormatType == FORMAT_TYPE::FORMAT_UNORM || OriginalFormatType == FORMAT_TYPE::FORMAT_SNORM)
           && UpgradedFormatType != FORMAT_TYPE::FORMAT_UNORM
           && UpgradedFormatType != FORMAT_TYPE::FORMAT_SNORM
-          && UpgradedFormatType != FORMAT_TYPE::FORMAT_FLOAT) {
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SFLOAT) {
       return false;
     }
     else if (OriginalFormat == DXGI_FORMAT_R11G11B10_FLOAT
+          && UpgradedFormat >  DXGI_FORMAT_R16G16B16A16_FLOAT) {
+      return false;
+    }
+    else if (OriginalFormat == DXGI_FORMAT_R9G9B9E5_SHAREDEXP
           && UpgradedFormat >  DXGI_FORMAT_R16G16B16A16_FLOAT) {
       return false;
     }
@@ -181,18 +185,19 @@ namespace dxvk {
           }
 
     GET_TARGET_FMT(if,      "rgba32_typeless",  DXGI_FORMAT_R32G32B32A32_TYPELESS)
-    GET_TARGET_FMT(else if, "rgba32_float",     DXGI_FORMAT_R32G32B32A32_FLOAT)
+    GET_TARGET_FMT(else if, "rgba32_sfloat",    DXGI_FORMAT_R32G32B32A32_FLOAT)
     GET_TARGET_FMT(else if, "rgba32_uint",      DXGI_FORMAT_R32G32B32A32_UINT)
     GET_TARGET_FMT(else if, "rgba32_sint",      DXGI_FORMAT_R32G32B32A32_SINT)
     GET_TARGET_FMT(else if, "rgba16_typeless",  DXGI_FORMAT_R16G16B16A16_TYPELESS)
-    GET_TARGET_FMT(else if, "rgba16_float",     DXGI_FORMAT_R16G16B16A16_FLOAT)
+    GET_TARGET_FMT(else if, "rgba16_sfloat",    DXGI_FORMAT_R16G16B16A16_FLOAT)
     GET_TARGET_FMT(else if, "rgba16_unorm",     DXGI_FORMAT_R16G16B16A16_UNORM)
-    GET_TARGET_FMT(else if, "rgba16_uint",      DXGI_FORMAT_R16G16B16A16_UINT)
     GET_TARGET_FMT(else if, "rgba16_snorm",     DXGI_FORMAT_R16G16B16A16_SNORM)
+    GET_TARGET_FMT(else if, "rgba16_uint",      DXGI_FORMAT_R16G16B16A16_UINT)
     GET_TARGET_FMT(else if, "rgba16_sint",      DXGI_FORMAT_R16G16B16A16_SINT)
     GET_TARGET_FMT(else if, "rgb10a2_typeless", DXGI_FORMAT_R10G10B10A2_TYPELESS)
     GET_TARGET_FMT(else if, "rgb10a2_unorm",    DXGI_FORMAT_R10G10B10A2_UNORM)
     GET_TARGET_FMT(else if, "rgb10a2_uint",     DXGI_FORMAT_R10G10B10A2_UINT)
+    // GET_TARGET_FMT(else if, "rgb9e5_ufloat",    DXGI_FORMAT_R9G9B9E5_SHAREDEXP)
     else {
       Logger::info(str::format("D3D11: render target upgrade disabled for: ",
                                GetDXGIFormatNameAsString(OriginalFormat)));
@@ -223,6 +228,98 @@ namespace dxvk {
 
   }
 
+  bool CheckFormatCompatabilityOther(
+    const FORMAT_TYPE OriginalFormatType,
+    const FORMAT_TYPE UpgradedFormatType)
+  {
+
+    if (OriginalFormatType == FORMAT_TYPE::FORMAT_TYPELESS
+     && UpgradedFormatType != OriginalFormatType) {
+      return false;
+    }
+    else if ((OriginalFormatType == FORMAT_TYPE::FORMAT_UINT || OriginalFormatType == FORMAT_TYPE::FORMAT_SINT)
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_UINT
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SINT) {
+      return false;
+    }
+    else if ((OriginalFormatType == FORMAT_TYPE::FORMAT_UNORM || OriginalFormatType == FORMAT_TYPE::FORMAT_SNORM)
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_UNORM
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SNORM
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SFLOAT) {
+      return false;
+    }
+    else {
+      return true;
+    }
+
+  }
+
+  void DXGI_FORMAT_OtherUpgradeHelper(
+    const std::string                         UpgradedFormatString,
+    const DXGI_FORMAT                         OriginalFormat,
+          std::array<FormatUpgradeInfo, 116>* pFormatUpgradeInfoArray)
+  {
+
+    DXGI_FORMAT UpgradedFormat = DXGI_FORMAT_UNKNOWN;
+
+#define GET_TARGET_FMT(if_, UpgradedFormatAsString, targetDXGIFMT) \
+          if_ (UpgradedFormatString == UpgradedFormatAsString) {   \
+            UpgradedFormat = targetDXGIFMT;                        \
+          }
+
+    GET_TARGET_FMT(if,      "rg32_typeless", DXGI_FORMAT_R32G32_TYPELESS)
+    GET_TARGET_FMT(else if, "rg32_sfloat",   DXGI_FORMAT_R32G32_FLOAT)
+    GET_TARGET_FMT(else if, "rg32_uint",     DXGI_FORMAT_R32G32_UINT)
+    GET_TARGET_FMT(else if, "rg32_sint",     DXGI_FORMAT_R32G32_SINT)
+    GET_TARGET_FMT(else if, "rg16_typeless", DXGI_FORMAT_R16G16_TYPELESS)
+    GET_TARGET_FMT(else if, "rg16_sfloat",   DXGI_FORMAT_R16G16_FLOAT)
+    GET_TARGET_FMT(else if, "rg16_unorm",    DXGI_FORMAT_R16G16_UNORM)
+    GET_TARGET_FMT(else if, "rg16_snorm",    DXGI_FORMAT_R16G16_SNORM)
+    GET_TARGET_FMT(else if, "rg16_uint",     DXGI_FORMAT_R16G16_UINT)
+    GET_TARGET_FMT(else if, "rg16_sint",     DXGI_FORMAT_R16G16_SINT)
+    GET_TARGET_FMT(else if, "rg8_typeless",  DXGI_FORMAT_R8G8_TYPELESS)
+    GET_TARGET_FMT(else if, "rg8_unorm",     DXGI_FORMAT_R8G8_UNORM)
+    GET_TARGET_FMT(else if, "rg8_snorm",     DXGI_FORMAT_R8G8_SNORM)
+    GET_TARGET_FMT(else if, "rg8_uint",      DXGI_FORMAT_R8G8_UINT)
+    GET_TARGET_FMT(else if, "rg8_sint",      DXGI_FORMAT_R8G8_SINT)
+    GET_TARGET_FMT(else if, "r32_typeless",  DXGI_FORMAT_R32_TYPELESS)
+    GET_TARGET_FMT(else if, "r32_sfloat",    DXGI_FORMAT_R32_FLOAT)
+    GET_TARGET_FMT(else if, "r32_uint",      DXGI_FORMAT_R32_UINT)
+    GET_TARGET_FMT(else if, "r32_sint",      DXGI_FORMAT_R32_SINT)
+    GET_TARGET_FMT(else if, "r16_typeless",  DXGI_FORMAT_R16_TYPELESS)
+    GET_TARGET_FMT(else if, "r16_sfloat",    DXGI_FORMAT_R16_FLOAT)
+    GET_TARGET_FMT(else if, "r16_unorm",     DXGI_FORMAT_R16_UNORM)
+    GET_TARGET_FMT(else if, "r16_snorm",     DXGI_FORMAT_R16_SNORM)
+    GET_TARGET_FMT(else if, "r16_uint",      DXGI_FORMAT_R16_UINT)
+    GET_TARGET_FMT(else if, "r16_sint",      DXGI_FORMAT_R16_SINT)
+    else {
+      Logger::info(str::format("D3D11: render target upgrade disabled for: ",
+                               GetDXGIFormatNameAsString(OriginalFormat)));
+      return;
+    }
+
+    if(CheckFormatCompatabilityOther(pFormatUpgradeInfoArray->at(static_cast<size_t>(OriginalFormat)).type,
+                                     pFormatUpgradeInfoArray->at(static_cast<size_t>(UpgradedFormat)).type)) {
+      Logger::info(str::format("D3D11: render target upgrade enabled for:  ",
+                               GetDXGIFormatNameAsString(OriginalFormat),
+                               " -> ",
+                               GetDXGIFormatNameAsString(UpgradedFormat)));
+      pFormatUpgradeInfoArray->at(static_cast<size_t>(OriginalFormat)).upgradedFormat = UpgradedFormat;
+      return;
+    }
+    else {
+      Logger::info(str::format("D3D11: render target upgrade disabled for: ",
+                               GetDXGIFormatNameAsString(OriginalFormat),
+                               " -> ",
+                               GetDXGIFormatNameAsString(UpgradedFormat),
+                               " is not possible"));
+      return;
+    }
+
+#undef GET_TARGET_FMT
+
+  }
+
   DXGI_FORMAT BackBufferFormatUpgradeHelper(const std::string Format)
   {
     DXGI_FORMAT upgradedFormat;
@@ -232,7 +329,7 @@ namespace dxvk {
     else if (Format == "rgba16_unorm") {
       upgradedFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
     }
-    else if (Format == "rgba16_float") {
+    else if (Format == "rgba16_sfloat") {
       upgradedFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
     }
     else {
@@ -266,7 +363,7 @@ namespace dxvk {
     else if (Format == "rgba16_unorm") {
       upgradedFormat = VK_FORMAT_R16G16B16A16_UNORM;
     }
-    else if (Format == "rgba16_float") {
+    else if (Format == "rgba16_sfloat") {
       upgradedFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
     }
     else if (Format == "unchanged") {
@@ -387,28 +484,68 @@ namespace dxvk {
             OriginalFormat,                                                                  \
             &this->formatUpgradeInfoArray)
 
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_TYPELESS",  DXGI_FORMAT_R16G16B16A16_TYPELESS);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_FLOAT",     DXGI_FORMAT_R16G16B16A16_FLOAT);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_UNORM",     DXGI_FORMAT_R16G16B16A16_UNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_UINT",      DXGI_FORMAT_R16G16B16A16_UINT);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_SNORM",     DXGI_FORMAT_R16G16B16A16_SNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_SINT",      DXGI_FORMAT_R16G16B16A16_SINT);
-    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_TYPELESS", DXGI_FORMAT_R10G10B10A2_TYPELESS);
-    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_UNORM",    DXGI_FORMAT_R10G10B10A2_UNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_UINT",     DXGI_FORMAT_R10G10B10A2_UINT);
-    DXGI_FORMAT_UPGRADE_HELPER("RG11B10_FLOAT",    DXGI_FORMAT_R11G11B10_FLOAT);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_TYPELESS",   DXGI_FORMAT_R8G8B8A8_TYPELESS);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_TYPELESS",   DXGI_FORMAT_B8G8R8A8_TYPELESS);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_TYPELESS",   DXGI_FORMAT_B8G8R8X8_TYPELESS);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UNORM",      DXGI_FORMAT_R8G8B8A8_UNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_UNORM",      DXGI_FORMAT_B8G8R8A8_UNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_UNORM",      DXGI_FORMAT_B8G8R8X8_UNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UNORM_SRGB", DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_UNORM_SRGB", DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
-    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_UNORM_SRGB", DXGI_FORMAT_B8G8R8X8_UNORM_SRGB);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UINT",       DXGI_FORMAT_R8G8B8A8_UINT);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_SNORM",      DXGI_FORMAT_R8G8B8A8_SNORM);
-    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_SINT",       DXGI_FORMAT_R8G8B8A8_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_TYPELESS",   DXGI_FORMAT_R16G16B16A16_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_SFLOAT",     DXGI_FORMAT_R16G16B16A16_FLOAT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_UNORM",      DXGI_FORMAT_R16G16B16A16_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_SNORM",      DXGI_FORMAT_R16G16B16A16_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_UINT",       DXGI_FORMAT_R16G16B16A16_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA16_SINT",       DXGI_FORMAT_R16G16B16A16_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_TYPELESS",  DXGI_FORMAT_R10G10B10A2_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_UNORM",     DXGI_FORMAT_R10G10B10A2_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RGB10A2_UINT",      DXGI_FORMAT_R10G10B10A2_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RG11B10_UFLOAT",    DXGI_FORMAT_R11G11B10_FLOAT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGB9E5_SHAREDEXP",  DXGI_FORMAT_R9G9B9E5_SHAREDEXP);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_TYPELESS",    DXGI_FORMAT_R8G8B8A8_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_TYPELESS",    DXGI_FORMAT_B8G8R8A8_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_TYPELESS",    DXGI_FORMAT_B8G8R8X8_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UNORM",       DXGI_FORMAT_R8G8B8A8_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_UNORM",       DXGI_FORMAT_B8G8R8A8_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_UNORM",       DXGI_FORMAT_B8G8R8X8_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UNORM_SRGB",  DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRA8_UNORM_SRGB",  DXGI_FORMAT_B8G8R8A8_UNORM_SRGB);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRX8_UNORM_SRGB",  DXGI_FORMAT_B8G8R8X8_UNORM_SRGB);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_SNORM",       DXGI_FORMAT_R8G8B8A8_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_UINT",        DXGI_FORMAT_R8G8B8A8_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RGBA8_SINT",        DXGI_FORMAT_R8G8B8A8_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("BGRA4_UNORM",       DXGI_FORMAT_B4G4R4A4_UNORM);
+
+#undef DXGI_FORMAT_UPGRADE_HELPER
+
+#define DXGI_FORMAT_UPGRADE_HELPER(CfgString, OriginalFormat)                                \
+          DXGI_FORMAT_OtherUpgradeHelper(                                                    \
+            Config::toLower(config.getOption<std::string>(("d3d11.upgrade_"                  \
+                                                           CfgString                         \
+                                                           "_renderTargetTo"), "disabled")), \
+            OriginalFormat,                                                                  \
+            &this->formatUpgradeInfoArray)
+
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_TYPELESS",     DXGI_FORMAT_R16G16_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_SFLOAT",       DXGI_FORMAT_R16G16_FLOAT);
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_UNORM",        DXGI_FORMAT_R16G16_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_SNORM",        DXGI_FORMAT_R16G16_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_UINT",         DXGI_FORMAT_R16G16_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RG16_SINT",         DXGI_FORMAT_R16G16_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RG8_TYPELESS",      DXGI_FORMAT_R8G8_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("RG8_UNORM",         DXGI_FORMAT_R8G8_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RG8_SNORM",         DXGI_FORMAT_R8G8_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("RG8_UINT",          DXGI_FORMAT_R8G8_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("RG8_SINT",          DXGI_FORMAT_R8G8_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R32_TYPELESS",      DXGI_FORMAT_R32_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("R32_SFLOAT",        DXGI_FORMAT_R32_FLOAT);
+    DXGI_FORMAT_UPGRADE_HELPER("R32_UINT",          DXGI_FORMAT_R32_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R32_SINT",          DXGI_FORMAT_R32_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_TYPELESS",      DXGI_FORMAT_R16_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_SFLOAT",        DXGI_FORMAT_R16_FLOAT);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_UNORM",         DXGI_FORMAT_R16_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_SNORM",         DXGI_FORMAT_R16_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_UINT",          DXGI_FORMAT_R16_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R16_SINT",          DXGI_FORMAT_R16_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R8_TYPELESS",       DXGI_FORMAT_R8_TYPELESS);
+    DXGI_FORMAT_UPGRADE_HELPER("R8_UNORM",          DXGI_FORMAT_R8_UNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("R8_SNORM",          DXGI_FORMAT_R8_SNORM);
+    DXGI_FORMAT_UPGRADE_HELPER("R8_UINT",           DXGI_FORMAT_R8_UINT);
+    DXGI_FORMAT_UPGRADE_HELPER("R8_SINT",           DXGI_FORMAT_R8_SINT);
+    DXGI_FORMAT_UPGRADE_HELPER("A8_UNORM",          DXGI_FORMAT_A8_UNORM);
 
 #undef DXGI_FORMAT_UPGRADE_HELPER
     // HDR-mod options end
