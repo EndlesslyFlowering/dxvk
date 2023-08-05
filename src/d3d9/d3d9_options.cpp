@@ -124,8 +124,8 @@ namespace dxvk {
     GET_FORMAT_UPGRADE(if,      "rgb10a2_unorm", D3DFMT_A2B10G10R10)
     GET_FORMAT_UPGRADE(else if, "bgr10a2_unorm", D3DFMT_A2R10G10B10)
     GET_FORMAT_UPGRADE(else if, "rgba16_unorm",  D3DFMT_A16B16G16R16)
-    GET_FORMAT_UPGRADE(else if, "rgba16_float",  D3DFMT_A16B16G16R16F)
-    GET_FORMAT_UPGRADE(else if, "rgba32_float",  D3DFMT_A32B32G32R32F)
+    GET_FORMAT_UPGRADE(else if, "rgba16_sfloat", D3DFMT_A16B16G16R16F)
+    GET_FORMAT_UPGRADE(else if, "rgba32_sfloat", D3DFMT_A32B32G32R32F)
     else {
       Logger::info(str::format("D3D9: render target upgrade disabled for: ",
                    GetD3DFormatAsString(OriginalFormat)));
@@ -151,7 +151,7 @@ namespace dxvk {
     else if (Format == "rgba16_unorm") {
       upgradedFormat = D3DFMT_A16B16G16R16;
     }
-    else if (Format == "rgba16_float") {
+    else if (Format == "rgba16_sfloat") {
       upgradedFormat = D3DFMT_A16B16G16R16F;
     }
     else {
@@ -185,7 +185,7 @@ namespace dxvk {
     else if (Format == "rgba16_unorm") {
       upgradedFormat = VK_FORMAT_R16G16B16A16_UNORM;
     }
-    else if (Format == "rgba16_float") {
+    else if (Format == "rgba16_sfloat") {
       upgradedFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
     }
     else if (Format == "unchanged") {
@@ -364,15 +364,15 @@ namespace dxvk {
     D3DFORMAT_UPGRADE_HELPER("RGB10A2_UNORM", D3DFMT_A2B10G10R10);
     D3DFORMAT_UPGRADE_HELPER("BGR10A2_UNORM", D3DFMT_A2R10G10B10);
     D3DFORMAT_UPGRADE_HELPER("RGBA16_UNORM",  D3DFMT_A16B16G16R16);
-    D3DFORMAT_UPGRADE_HELPER("RGBA16_FLOAT",  D3DFMT_A16B16G16R16F);
+    D3DFORMAT_UPGRADE_HELPER("RGBA16_SFLOAT", D3DFMT_A16B16G16R16F);
 
 #undef D3DFORMAT_UPGRADE_HELPER
 
 
     this->upgradeSwapChainFormatTo =
-      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "rgba16f")));
+      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "disabled")));
     this->upgradeSwapChainColorSpaceTo =
-      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "scRGB")));
+      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "disabled")));
     if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
      || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
       Logger::info("DXVK (D3D9): swap chain upgrade disabled");
