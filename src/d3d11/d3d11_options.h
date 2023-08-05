@@ -408,10 +408,10 @@ namespace dxvk {
     //DXGI_FORMAT upgrade_BGRX8_UNORM_SRGB_To;
 
     /// enable back buffer upgrade
-    bool enableBackBufferFormatUpgrade;
+    bool enableBackBufferUpgrade;
 
     /// back buffer format to upgrade to
-    DXGI_FORMAT upgradeBackBufferFormatTo;
+    DXGI_FORMAT upgradeBackBufferTo;
 
     /// enable upgrade swapchain
     bool enableSwapChainUpgrade;

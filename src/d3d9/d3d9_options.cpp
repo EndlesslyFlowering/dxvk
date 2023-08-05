@@ -332,15 +332,15 @@ namespace dxvk {
     this->samplerLodBias = dxvk::fclamp(this->samplerLodBias, -2.0f, 1.0f);
 
     //HDR-mod options start
-    this->enableRenderTargetUpgrades    = config.getOption<bool> ("d3d9.enableRenderTargetUpgrades",    false);
-    this->enableBackBufferFormatUpgrade = config.getOption<bool> ("d3d9.enableBackBufferFormatUpgrade", false);
-    this->enableSwapChainUpgrade        = config.getOption<bool> ("d3d9.enableSwapChainUpgrade",        false);
+    this->enableRenderTargetUpgrades    = config.getOption<bool> ("d3d9.enableRenderTargetUpgrades", false);
+    this->enableBackBufferUpgrade       = config.getOption<bool> ("d3d9.enableBackBufferUpgrade",    false);
+    this->enableSwapChainUpgrade        = config.getOption<bool> ("d3d9.enableSwapChainUpgrade",     false);
 
 
-    this->upgradeBackBufferFormatTo =
-      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeBackBufferFormatTo", "disabled")));
-    if (this->upgradeBackBufferFormatTo == D3DFMT_UNKNOWN) {
-      this->enableBackBufferFormatUpgrade = false;
+    this->upgradeBackBufferTo =
+      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeBackBufferTo", "disabled")));
+    if (this->upgradeBackBufferTo == D3DFMT_UNKNOWN) {
+      this->enableBackBufferUpgrade = false;
     }
 
 
