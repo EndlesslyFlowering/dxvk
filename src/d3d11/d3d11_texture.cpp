@@ -1,5 +1,6 @@
 #include "d3d11_device.h"
 #include "d3d11_context_imm.h"
+#include "d3d11_enums.h"
 #include "d3d11_gdi.h"
 #include "d3d11_render_target_upgrade_helper.h"
 #include "d3d11_texture.h"
@@ -270,8 +271,8 @@ namespace dxvk {
         "\n  Samples: ", m_desc.SampleDesc.Count,
         "\n  Layers:  ", m_desc.ArraySize,
         "\n  Levels:  ", m_desc.MipLevels,
-        "\n  Usage:   ", std::hex, m_desc.BindFlags,
-        "\n  Flags:   ", std::hex, m_desc.MiscFlags));
+        "\n  Usage:   ", enumerateD3d11BindFlags(m_desc.BindFlags),
+        "\n  Flags:   ", enumerateD3d11MiscFlags(m_desc.MiscFlags)));
     }
 
     if (m_11on12.Resource != nullptr)
