@@ -20,7 +20,16 @@ namespace dxvk {
     UINT                      MiscFlags;
     UINT                      DxgiUsage;
   };
-  
+
+  /**
+   * \brief Returns unupgraded DXGI_FORMAT
+   *
+   * \param [in] pResource The resource to query
+   * \returns \c DXGI_FORMAT_FORCE_UINT if the format wasn't upgraded
+   */
+  DXGI_FORMAT GetOriginalResourceFormat(
+          ID3D11Resource* pResource);
+
 
   /**
    * \brief IDXGIKeyedMutex implementation
