@@ -422,12 +422,6 @@ namespace dxvk {
     /// output color space to upgrade to
     VkColorSpaceKHR upgradeSwapChainColorSpaceTo;
 
-    /// log formats used
-    bool logRenderTargetFormatsUsed;
-
-    /// log all views used
-    bool logViewsOfRenderTargets;
-
     /// Shader dump path
     std::string shaderDumpPath;
   };

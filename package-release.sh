@@ -24,6 +24,7 @@ shift 2
 
 opt_nopackage=0
 opt_devbuild=0
+opt_hdrdebug=false
 opt_buildid=false
 
 crossfile="build-win"
@@ -36,6 +37,7 @@ while [ $# -gt 0 ]; do
   "--dev-build")
     opt_nopackage=1
     opt_devbuild=1
+    opt_hdrdebug=true
     ;;
   "--build-id")
     opt_buildid=true
@@ -65,6 +67,7 @@ function build_arch {
         --bindir "x$1"                                      \
         --libdir "x$1"                                      \
         -Dbuild_id=$opt_buildid                             \
+        -Dhdr_debug=$opt_hdrdebug                           \
         "$DXVK_BUILD_DIR/build.$1"
 
   cd "$DXVK_BUILD_DIR/build.$1"

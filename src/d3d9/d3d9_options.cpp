@@ -335,7 +335,6 @@ namespace dxvk {
     this->enableRenderTargetUpgrades    = config.getOption<bool> ("d3d9.enableRenderTargetUpgrades",    false);
     this->enableBackBufferFormatUpgrade = config.getOption<bool> ("d3d9.enableBackBufferFormatUpgrade", false);
     this->enableSwapChainUpgrade        = config.getOption<bool> ("d3d9.enableSwapChainUpgrade",        false);
-    this->logRenderTargetFormatsUsed    = config.getOption<bool> ("d3d9.logRenderTargetFormatsUsed",    false);
 
 
     this->upgradeBackBufferFormatTo =

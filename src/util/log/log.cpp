@@ -122,8 +122,15 @@ namespace dxvk {
     const std::string logLevelStr = env::getEnvVar("DXVK_LOG_LEVEL");
     
     for (const auto& pair : logLevels) {
-      if (logLevelStr == pair.first)
+      if (logLevelStr == pair.first) {
+#ifdef _HDR_DEBUG
+        LogLevel curLogLevel = pair.second;
+        if (curLogLevel > LogLevel::Info) {
+          return LogLevel::Info;
+        }
+#endif
         return pair.second;
+      }
     }
     
     return LogLevel::Info;

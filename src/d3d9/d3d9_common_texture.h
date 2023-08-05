@@ -486,10 +486,12 @@ namespace dxvk {
 
   private:
 
+#ifdef _HDR_DEBUG
     void RenderTargetFormatLogger(
-      const D3D9Format OriginalFormat,
-      const D3D9Format UpgradedFormat = D3D9Format::Unknown,
-      const bool       IsBackBuffer   = false);
+      D3D9Format OriginalFormat,
+      bool       IsBackBuffer   = false,
+      D3D9Format UpgradedFormat = D3D9Format::Unknown);
+#endif
 
     D3D9DeviceEx*                 m_device;
     D3D9_COMMON_TEXTURE_DESC      m_desc;
