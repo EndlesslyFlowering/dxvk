@@ -52,7 +52,7 @@ namespace dxvk {
     : Format == DXGI_FORMAT_R32_FLOAT                  ? "         R32_FLOAT           "
     : Format == DXGI_FORMAT_R32_UINT                   ? "         R32_UINT            "
     : Format == DXGI_FORMAT_R32_SINT                   ? "         R32_SINT            "
-    : Format == DXGI_FORMAT_R24G8_TYPELESS             ? "R24G8_TYPELESS               "
+    : Format == DXGI_FORMAT_R24G8_TYPELESS             ? "       R24G8_TYPELESS        "
     : Format == DXGI_FORMAT_D24_UNORM_S8_UINT          ? "D24_UNORM_S8_UINT            "
     : Format == DXGI_FORMAT_R24_UNORM_X8_TYPELESS      ? "R24_UNORM_X8_TYPELESS        "
     : Format == DXGI_FORMAT_X24_TYPELESS_G8_UINT       ? "X24_TYPELESS_G8_UINT         "
@@ -138,11 +138,19 @@ namespace dxvk {
     const FORMAT_TYPE UpgradedFormatType)
   {
 
-    if ((OriginalFormatType == FORMAT_TYPE::FORMAT_SINT
-      || OriginalFormatType == FORMAT_TYPE::FORMAT_SNORM
-      || OriginalFormatType == FORMAT_TYPE::FORMAT_UINT
-      || OriginalFormatType == FORMAT_TYPE::FORMAT_TYPELESS)
-     && OriginalFormatType != UpgradedFormatType) {
+    if (OriginalFormatType == FORMAT_TYPE::FORMAT_TYPELESS
+     && UpgradedFormatType != OriginalFormatType) {
+      return false;
+    }
+    else if ((OriginalFormatType == FORMAT_TYPE::FORMAT_UINT || OriginalFormatType == FORMAT_TYPE::FORMAT_SINT)
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_UINT
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SINT) {
+      return false;
+    }
+    else if ((OriginalFormatType == FORMAT_TYPE::FORMAT_UNORM || OriginalFormatType == FORMAT_TYPE::FORMAT_SNORM)
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_UNORM
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_SNORM
+          && UpgradedFormatType != FORMAT_TYPE::FORMAT_FLOAT) {
       return false;
     }
     else if (OriginalFormat == DXGI_FORMAT_R11G11B10_FLOAT
