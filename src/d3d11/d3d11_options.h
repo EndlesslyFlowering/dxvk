@@ -414,12 +414,6 @@ namespace dxvk {
     /// output color space to upgrade to
     VkColorSpaceKHR upgradeSwapChainColorSpaceTo;
 
-    /// log formats used
-    bool logRenderTargetFormatsUsed;
-
-    /// log all views used
-    bool logViewsOfRenderTargets;
-
     /// Ensure that for the same D3D commands the output VK commands
     /// don't change between runs. Useful for comparative benchmarking,
     /// can negatively affect performance.
