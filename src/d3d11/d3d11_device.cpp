@@ -410,16 +410,14 @@ namespace dxvk {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW);
     }
     else if (m_d3d11Options.enableBackBufferFormatUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.upgradeBackBufferFormatTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW);
     }
 
 
@@ -438,8 +436,8 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.logViewsOfRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+#ifdef _HDR_DEBUG
+    if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Shader Resource View of Render Target created:",
                                "\n  Resource type:    ", resourceDesc.Dim,
                                "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
@@ -450,7 +448,8 @@ namespace dxvk {
                                enumerateD3d11SrvDesc1(&desc),
                                "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
-    
+#endif
+
     if (!ppSRView)
       return S_FALSE;
     
@@ -533,16 +532,14 @@ namespace dxvk {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW);
     }
     else if (m_d3d11Options.enableBackBufferFormatUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.upgradeBackBufferFormatTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW);
     }
 
 
@@ -561,8 +558,8 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.logViewsOfRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+#ifdef _HDR_DEBUG
+    if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Unordered Access View of Render Target created:",
                                "\n  Resource type:   ", resourceDesc.Dim,
                                "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
@@ -573,6 +570,7 @@ namespace dxvk {
                                enumerateD3d11UavDesc1(&desc),
                                "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
+#endif
 
     if (!ppUAView)
       return S_FALSE;
@@ -659,16 +657,14 @@ namespace dxvk {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW);
     }
     else if (m_d3d11Options.enableBackBufferFormatUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
                       m_d3d11Options.upgradeBackBufferFormatTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW,
-                      m_d3d11Options.logRenderTargetFormatsUsed);
+                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW);
     }
 
 
@@ -687,8 +683,8 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.logViewsOfRenderTargets
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
+#ifdef _HDR_DEBUG
+    if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Render Target View created:",
                                "\n  Resource type:    ", resourceDesc.Dim,
                                "\n  Resource usage:   ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
@@ -699,6 +695,7 @@ namespace dxvk {
                                enumerateD3d11RtvDesc1(&desc),
                                "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
+#endif
 
     if (!ppRTView)
       return S_FALSE;
@@ -754,15 +751,13 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-//    if (m_d3d11Options.logViewsOfRenderTargets) {
-//      Logger::info(str::format("D3D11: Depth-Stencil View created:",
-//                               "\n  Resource type:   ", resourceDesc.Dim,
-//                               "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
-//                               "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
-//                               "\n  Resource format: ", resourceDesc.Format,
-//                               "\n  View format:     ", desc.Format));
-//    }
-    
+  //  Logger::info(str::format("D3D11: Depth-Stencil View created:",
+  //                           "\n  Resource type:   ", resourceDesc.Dim,
+  //                           "\n  Resource usage:  ", enumerateD3d11BindFlags(resourceDesc.BindFlags),
+  //                           "\n  Resource flags:  ", enumerateD3d11MiscFlags(resourceDesc.MiscFlags),
+  //                           "\n  Resource format: ", resourceDesc.Format,
+  //                           "\n  View format:     ", desc.Format));
+
     if (ppDepthStencilView == nullptr)
       return S_FALSE;
     

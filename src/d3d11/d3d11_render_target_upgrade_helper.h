@@ -22,8 +22,7 @@ namespace dxvk {
     static DXGI_FORMAT UpgradeFormat(
             DXGI_FORMAT         OriginalFormat,
             DXGI_FORMAT         UpgradedFormat,
-            FORMAT_UPGRADE_TYPE UpgradeType,
-            bool                LogRenderTargetFormatsUsed);
+            FORMAT_UPGRADE_TYPE UpgradeType);
 
 
   private:
