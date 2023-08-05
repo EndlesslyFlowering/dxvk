@@ -29,6 +29,9 @@ namespace dxvk {
                         m_device->GetOptions()->formatUpgradeInfoArray[m_desc.Format].upgradedFormat,
                         D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET,
                         m_device->GetOptions()->logRenderTargetFormatsUsed);
+#ifdef _HDR_DEBUG
+      Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+#endif
     }
     else if (m_device->GetOptions()->enableBackBufferFormatUpgrade
           && m_dxgiUsage & DXGI_USAGE_BACK_BUFFER) {
@@ -37,6 +40,9 @@ namespace dxvk {
                         m_device->GetOptions()->upgradeBackBufferFormatTo,
                         D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER,
                         m_device->GetOptions()->logRenderTargetFormatsUsed);
+#ifdef _HDR_DEBUG
+      Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+#endif
     }
 
     DXGI_VK_FORMAT_INFO   formatInfo   = m_device->LookupFormat(m_desc.Format, formatMode);

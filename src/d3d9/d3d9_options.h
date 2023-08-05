@@ -186,9 +186,6 @@ namespace dxvk {
     /// disables 
     //bool disableSrgbSamplingAndWriting;
 
-    /// log render target formats used
-    bool logRenderTargetFormatsUsed;
-
     /// enfore fullscreen exclusive or windowed mode
     /// for the internal swap chain
     bool enforceWindowModeInternally;

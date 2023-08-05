@@ -12,45 +12,41 @@ namespace dxvk {
 
   bool D3D9CommonTexture::forceDisableRenderTargetUpgrades = false;
 
+#ifdef _HDR_DEBUG
   void D3D9CommonTexture::RenderTargetFormatLogger(
-    const D3D9Format OriginalFormat,
-    const D3D9Format UpgradedFormat,
-    const bool       IsBackBuffer)
+    D3D9Format OriginalFormat,
+    bool       IsBackBuffer,
+    D3D9Format UpgradedFormat)
   {
-    if (m_device->GetOptions()->logRenderTargetFormatsUsed)
-    {
-      bool isUpgraded = UpgradedFormat != OriginalFormat
-                     && UpgradedFormat != D3D9Format::Unknown;
+    bool isUpgraded = UpgradedFormat != OriginalFormat
+                   && UpgradedFormat != D3D9Format::Unknown;
 
-      std::string logString;
+    std::string logString;
 
-      if (unlikely(IsBackBuffer)) {
-        logString = ("back buffer");
-      }
-      else {
-        logString = ("render target");
-      }
-
-      if (isUpgraded) {
-        Logger::info(str::format("D3D9: ",
-                                 logString.c_str(),
-                                 !IsBackBuffer ? " format upgraded: " : " format upgraded:   ",
-                                 OriginalFormat,
-                                 " -> ",
-                                 UpgradedFormat));
-      }
-      else {
-        Logger::info(str::format("D3D9: used ",
-                                 logString.c_str(),
-                                 !IsBackBuffer ? ":     " : ":       ",
-                                 OriginalFormat));
-      }
-      return;
+    if (unlikely(IsBackBuffer)) {
+      logString = ("back buffer");
     }
     else {
-      return;
+      logString = ("render target");
     }
+
+    if (isUpgraded) {
+      Logger::info(str::format("D3D9: ",
+                               logString.c_str(),
+                               !IsBackBuffer ? " format upgraded: " : " format upgraded:   ",
+                               OriginalFormat,
+                               " -> ",
+                               UpgradedFormat));
+    }
+    else {
+      Logger::info(str::format("D3D9: used ",
+                               logString.c_str(),
+                               !IsBackBuffer ? ":     " : ":       ",
+                               OriginalFormat));
+    }
+    return;
   }
+#endif
 
   D3D9CommonTexture::D3D9CommonTexture(
           D3D9DeviceEx*             pDevice,
@@ -81,23 +77,35 @@ namespace dxvk {
       SetAllNeedUpload();
     }
 
-#define DEFAULT_BACK_BUFFER_MAPPING                                          \
-          m_mapping = pDevice->LookupFormat(m_desc.Format);                  \
-          RenderTargetFormatLogger(m_desc.Format, D3D9Format::Unknown, true)
+#ifdef _HDR_DEBUG
+  #define DEFAULT_BACK_BUFFER_MAPPING                         \
+            m_mapping = pDevice->LookupFormat(m_desc.Format); \
+            RenderTargetFormatLogger(m_desc.Format, true)
+#else
+  #define DEFAULT_BACK_BUFFER_MAPPING                         \
+            m_mapping = pDevice->LookupFormat(m_desc.Format);
+#endif
 
-#define DEFAULT_RENDER_TARGET_MAPPING                       \
-          m_mapping = pDevice->LookupFormat(m_desc.Format); \
-          RenderTargetFormatLogger(m_desc.Format)
+#ifdef _HDR_DEBUG
+  #define DEFAULT_RENDER_TARGET_MAPPING                       \
+            m_mapping = pDevice->LookupFormat(m_desc.Format); \
+            RenderTargetFormatLogger(m_desc.Format)
+#else
+  #define DEFAULT_RENDER_TARGET_MAPPING                       \
+            m_mapping = pDevice->LookupFormat(m_desc.Format);
+#endif
 
     if (unlikely(m_desc.IsBackBuffer))
     {
-      if (m_device->GetOptions()->enableBackBufferFormatUpgrade
+      if (m_device->GetOptions()->enableBackBufferUpgrade
        && !forceDisableRenderTargetUpgrades)
       {
-        if (IsSensibleFormatUpgrade(static_cast<D3DFORMAT>(m_desc.Format), m_device->GetOptions()->upgradeBackBufferFormatTo)) {
-          const D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->upgradeBackBufferFormatTo);
+        if (IsSensibleFormatUpgrade(static_cast<D3DFORMAT>(m_desc.Format), m_device->GetOptions()->upgradeBackBufferTo)) {
+          D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->upgradeBackBufferTo);
           m_mapping = pDevice->LookupFormat(upgradedFormat);
-          RenderTargetFormatLogger(m_desc.Format, upgradedFormat, true);
+#ifdef _HDR_DEBUG
+          RenderTargetFormatLogger(m_desc.Format, true, upgradedFormat);
+#endif
         }
         else {
           DEFAULT_BACK_BUFFER_MAPPING;
@@ -119,7 +127,9 @@ namespace dxvk {
 
           if (upgradedFormat != D3D9Format::Unknown) {
             m_mapping = pDevice->LookupFormat(upgradedFormat);
-            RenderTargetFormatLogger(m_desc.Format, upgradedFormat);
+#ifdef _HDR_DEBUG
+            RenderTargetFormatLogger(m_desc.Format, false, upgradedFormat);
+#endif
           }
           else {
             DEFAULT_RENDER_TARGET_MAPPING;
