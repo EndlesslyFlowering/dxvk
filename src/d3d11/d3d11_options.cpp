@@ -350,15 +350,15 @@ namespace dxvk {
     this->reproducibleCommandStream     = config.getOption<bool>("d3d11.reproducibleCommandStream", false);
 
     // HDR-mod options start
-    this->enableRenderTargetUpgrades    = config.getOption<bool>("d3d11.enableRenderTargetUpgrades",    false);
-    this->enableBackBufferFormatUpgrade = config.getOption<bool>("d3d11.enableBackBufferFormatUpgrade", false);
-    this->enableSwapChainUpgrade        = config.getOption<bool>("d3d11.enableSwapChainUpgrade",        false);
+    this->enableRenderTargetUpgrades = config.getOption<bool>("d3d11.enableRenderTargetUpgrades", false);
+    this->enableBackBufferUpgrade    = config.getOption<bool>("d3d11.enableBackBufferUpgrade",    false);
+    this->enableSwapChainUpgrade     = config.getOption<bool>("d3d11.enableSwapChainUpgrade",     false);
 
 
-    this->upgradeBackBufferFormatTo =
-      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d11.upgradeBackBufferFormatTo", "disabled")));
-    if (this->upgradeBackBufferFormatTo == DXGI_FORMAT_UNKNOWN) {
-      this->enableBackBufferFormatUpgrade = false;
+    this->upgradeBackBufferTo =
+      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d11.upgradeBackBufferTo", "disabled")));
+    if (this->upgradeBackBufferTo == DXGI_FORMAT_UNKNOWN) {
+      this->enableBackBufferUpgrade = false;
     }
 
     this->upgradeSwapChainFormatTo =

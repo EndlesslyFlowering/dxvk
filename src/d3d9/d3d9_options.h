@@ -169,10 +169,10 @@ namespace dxvk {
     //D3DFORMAT upgrade_RGBA16_FLOAT_renderTargetTo;
 
     /// enable back buffer format upgrade
-    bool enableBackBufferFormatUpgrade;
+    bool enableBackBufferUpgrade;
 
     /// upgrade back buffer format to
-    D3DFORMAT upgradeBackBufferFormatTo;
+    D3DFORMAT upgradeBackBufferTo;
 
     /// enable upgrade swap chain
     bool enableSwapChainUpgrade;

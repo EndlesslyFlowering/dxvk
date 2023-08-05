@@ -381,11 +381,11 @@ namespace dxvk {
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW);
     }
-    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+    else if (m_d3d11Options.enableBackBufferUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
-                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      m_d3d11Options.upgradeBackBufferTo,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW);
     }
 
@@ -492,11 +492,11 @@ namespace dxvk {
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW);
     }
-    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+    else if (m_d3d11Options.enableBackBufferUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
-                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      m_d3d11Options.upgradeBackBufferTo,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW);
     }
 
@@ -611,11 +611,11 @@ namespace dxvk {
                       m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW);
     }
-    else if (m_d3d11Options.enableBackBufferFormatUpgrade
+    else if (m_d3d11Options.enableBackBufferUpgrade
           && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
       desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
                       desc.Format,
-                      m_d3d11Options.upgradeBackBufferFormatTo,
+                      m_d3d11Options.upgradeBackBufferTo,
                       D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW);
     }
 

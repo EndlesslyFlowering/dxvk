@@ -9,8 +9,8 @@ All options are also explained in the default [dxvk.conf](dxvk.conf)!
 ### d3d9:
 - [d3d9.enableRenderTargetUpgrades](#enableRenderTargetUpgrades-d3d9d3d11)
 - [d3d9.upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11)
-- [d3d9.enableBackBufferFormatUpgrade](d3d9enableBackBufferFormatUpgrade-d3d9d3d11)
-- [d3d9.upgradeBackBufferFormatTo](#upgradeBackBufferFormatTo-d3d9d3d11)
+- [d3d9.enableBackBufferUpgrade](d3d9enableBackBufferUpgrade-d3d9d3d11)
+- [d3d9.upgradeBackBufferTo](#upgradeBackBufferTo-d3d9d3d11)
 - [d3d9.enableSwapChainUpgrade](#enableSwapChainUpgrade-d3d9d3d11)
 - [d3d9.upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11)
 - [d3d9.upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11)
@@ -22,8 +22,8 @@ All options are also explained in the default [dxvk.conf](dxvk.conf)!
 ### d3d10/d3d11:
 - [d3d11.enableRenderTargetUpgrades](#enableRenderTargetUpgrades-d3d9d3d11)
 - [d3d11.upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11)
-- [d3d11.enableBackBufferFormatUpgrade](d3d9enableBackBufferFormatUpgrade-d3d9d3d11)
-- [d3d11.upgradeBackBufferFormatTo](#upgradeBackBufferFormatTo-d3d9d3d11)
+- [d3d11.enableBackBufferUpgrade](d3d9enableBackBufferUpgrade-d3d9d3d11)
+- [d3d11.upgradeBackBufferTo](#upgradeBackBufferTo-d3d9d3d11)
 - [d3d11.enableSwapChainUpgrade](#enableSwapChainUpgrade-d3d9d3d11)
 - [d3d11.upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11)
 - [d3d11.upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11)
@@ -208,19 +208,19 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 
 ---
 
-## enableBackBufferFormatUpgrade (d3d9/d3d11)
+## enableBackBufferUpgrade (d3d9/d3d11)
 
 Enable upgrading the back buffer format.\
-Set the format with [upgradeBackBufferFormatTo](#upgradeBackBufferFormatTo-d3d9d3d11).
+Set the format with [upgradeBackBufferTo](#upgradeBackBufferTo-d3d9d3d11).
 
 > Supported values: `True`, `False`\
 > Default/Fallback: `False`
 
 ---
 
-## upgradeBackBufferFormatTo (d3d9/d3d11)
+## upgradeBackBufferTo (d3d9/d3d11)
 Upgrade the back buffer format to another format.
-Needs '[enableBackBufferFormatUpgrade](#enableBackBufferFormatUpgrade-d3d9d3d11) = True'!
+Needs '[enableBackBufferUpgrade](#enableBackBufferUpgrade-d3d9d3d11) = True'!
 
 > Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
 > Default/Fallback: `disabled`
@@ -318,8 +318,8 @@ Log information about all view types of render targets.
     d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_float
     d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_float
     d3d9.upgrade_RGBA16_UNORM_renderTargetTo  = rgba32_float
-    d3d9.enableBackBufferFormatUpgrade        = true
-    d3d9.upgradeBackBufferFormatTo            = rgba16_float
+    d3d9.enableBackBufferUpgrade        = true
+    d3d9.upgradeBackBufferTo            = rgba16_float
     d3d9.enableSwapChainUpgrade               = true
     d3d9.upgradeSwapChainFormatTo             = rgba16_float
     d3d9.upgradeSwapChainColorSpaceTo         = scRGB
@@ -334,8 +334,8 @@ Log information about all view types of render targets.
     d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_unorm
     d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_unorm
     d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_unorm
-    d3d9.enableBackBufferFormatUpgrade        = true
-    d3d9.upgradeBackBufferFormatTo            = rgba16_unorm
+    d3d9.enableBackBufferUpgrade        = true
+    d3d9.upgradeBackBufferTo            = rgba16_unorm
     d3d9.enableSwapChainUpgrade               = true
     d3d9.upgradeSwapChainFormatTo             = rgb10a2_unorm
     d3d9.upgradeSwapChainColorSpaceTo         = unchanged
@@ -365,8 +365,8 @@ Log information about all view types of render targets.
     d3d11.upgrade_RGB10A2_TYPELESS_renderTargetTo = rgba16_typeless
     d3d11.upgrade_RG11B10_FLOAT_renderTargetTo    = rgba16_float
     d3d11.upgrade_RGBA16_UNORM_renderTargetTo     = rgba32_float
-    d3d11.enableBackBufferFormatUpgrade           = true
-    d3d11.upgradeBackBufferFormatTo               = rgba16_float
+    d3d11.enableBackBufferUpgrade           = true
+    d3d11.upgradeBackBufferTo               = rgba16_float
     d3d11.enableSwapChainUpgrade                  = true
     d3d11.upgradeSwapChainFormatTo                = rgba16_float
     d3d11.upgradeSwapChainColorSpaceTo            = scRGB
@@ -387,8 +387,8 @@ Log information about all view types of render targets.
     d3d11.upgrade_RGB10A2_UNORM_renderTargetTo    = rgba16_unorm
     d3d11.upgrade_RGB10A2_TYPELESS_renderTargetTo = rgba16_typeless
     d3d11.upgrade_RG11B10_FLOAT_renderTargetTo    = rgba16_float
-    d3d11.enableBackBufferFormatUpgrade           = true
-    d3d11.upgradeBackBufferFormatTo               = rgba16_unorm
+    d3d11.enableBackBufferUpgrade           = true
+    d3d11.upgradeBackBufferTo               = rgba16_unorm
     d3d11.enableSwapChainUpgrade                  = true
     d3d11.upgradeSwapChainFormatTo                = rgba10_unorm
     d3d11.upgradeSwapChainColorSpaceTo            = unchanged
