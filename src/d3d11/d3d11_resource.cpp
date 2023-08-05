@@ -8,6 +8,14 @@
 
 namespace dxvk {
 
+  DXGI_FORMAT GetOriginalResourceFormat(
+          ID3D11Resource* pResource) {
+    auto texture = GetCommonTexture(pResource);
+
+    return texture->GetOriginalFormat();
+  }
+
+
   D3D11DXGIKeyedMutex::D3D11DXGIKeyedMutex(
           ID3D11Resource* pResource,
           D3D11Device*    pDevice)
