@@ -21,25 +21,37 @@ namespace dxvk {
     m_11on12(p11on12Info ? *p11on12Info : D3D11_ON_12_RESOURCE_INFO()), m_dxgiUsage(DxgiUsage) {
     DXGI_VK_FORMAT_MODE   formatMode   = GetFormatMode();
 
-    if (m_device->GetOptions()->enableRenderTargetUpgrades
-     && formatMode == DXGI_VK_FORMAT_MODE_COLOR // DXGI_VK_FORMAT_MODE_COLOR == render target
-     && !(m_dxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-      m_desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                        m_desc.Format,
-                        m_device->GetOptions()->formatUpgradeInfoArray[m_desc.Format].upgradedFormat,
-                        D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET,
-                        m_device->GetOptions()->logRenderTargetFormatsUsed);
+    if (unlikely(m_device->GetOptions()->enableBackBufferUpgrade
+              && m_dxgiUsage & DXGI_USAGE_BACK_BUFFER))
+    {
+      DXGI_FORMAT upgradedFormat = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+                                     m_desc.Format,
+                                     m_device->GetOptions()->upgradeBackBufferTo,
+                                     D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER);
+      if (m_desc.Format != upgradedFormat)
+      {
+        originalFormat = m_desc.Format;
+
+        m_desc.Format = upgradedFormat;
+      }
 #ifdef _HDR_DEBUG
       Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
 #endif
     }
-    else if (m_device->GetOptions()->enableBackBufferFormatUpgrade
-          && m_dxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-      m_desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                        m_desc.Format,
-                        m_device->GetOptions()->upgradeBackBufferFormatTo,
-                        D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER,
-                        m_device->GetOptions()->logRenderTargetFormatsUsed);
+    else if (m_device->GetOptions()->enableRenderTargetUpgrades
+          && formatMode == DXGI_VK_FORMAT_MODE_COLOR) // DXGI_VK_FORMAT_MODE_COLOR == render target
+    {
+      DXGI_FORMAT upgradedFormat = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+                                     m_desc.Format,
+                                     m_device->GetOptions()->formatUpgradeInfoArray[m_desc.Format].upgradedFormat,
+                                     D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::RENDER_TARGET);
+
+      if (m_desc.Format != upgradedFormat)
+      {
+        originalFormat = m_desc.Format;
+
+        m_desc.Format = upgradedFormat;
+      }
 #ifdef _HDR_DEBUG
       Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
 #endif
