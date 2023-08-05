@@ -373,20 +373,33 @@ namespace dxvk {
         return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.enableRenderTargetUpgrades
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RESOURCE_VIEW);
+    if (unlikely(m_d3d11Options.enableBackBufferUpgrade && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER))
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.upgradeBackBufferTo,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_SHADER_RESOURCE_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
-    else if (m_d3d11Options.enableBackBufferUpgrade
-          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.upgradeBackBufferTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RESOURCE_VIEW);
+    else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::SHADER_RESOURCE_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
 
 
@@ -484,20 +497,34 @@ namespace dxvk {
         return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.enableRenderTargetUpgrades
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_UNORDERED_ACCESS_VIEW);
+
+    if (unlikely(m_d3d11Options.enableBackBufferUpgrade && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER))
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.upgradeBackBufferTo,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_UNORDERED_ACCESS_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
-    else if (m_d3d11Options.enableBackBufferUpgrade
-          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.upgradeBackBufferTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_UNORDERED_ACCESS_VIEW);
+    else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::UNORDERED_ACCESS_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
 
 
@@ -603,20 +630,34 @@ namespace dxvk {
         return E_INVALIDARG;
     }
 
-    if (m_d3d11Options.enableRenderTargetUpgrades
-     && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET
-     && !(resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER)) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.formatUpgradeInfoArray[desc.Format].upgradedFormat,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_RENDER_TARGET_VIEW);
+
+    if (unlikely(m_d3d11Options.enableBackBufferUpgrade && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER))
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.upgradeBackBufferTo,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_RENDER_TARGET_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
-    else if (m_d3d11Options.enableBackBufferUpgrade
-          && resourceDesc.DxgiUsage & DXGI_USAGE_BACK_BUFFER) {
-      desc.Format = D3D11RenderTargetUpgradeHelper::UpgradeFormat(
-                      desc.Format,
-                      m_d3d11Options.upgradeBackBufferTo,
-                      D3D11RenderTargetUpgradeHelper::FORMAT_UPGRADE_TYPE::UPGRADE_BACK_BUFFER_RENDER_TARGET_VIEW);
+    else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
+    {
+      DXGI_FORMAT originalFormat = GetOriginalResourceFormat(pResource);
+      if (originalFormat != DXGI_FORMAT_FORCE_UINT)
+      {
+        desc.Format = D3D11RenderTargetUpgradeHelper::RenderTargetFormatUpgradeHelper(
+          originalFormat,
+          m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
+          D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::RENDER_TARGET_VIEW);
+#ifdef _HDR_DEBUG
+          Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
+#endif
+      }
     }
 
 

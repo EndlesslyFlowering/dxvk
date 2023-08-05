@@ -470,8 +470,20 @@ namespace dxvk {
       const D3D11_RESOURCE_FLAGS*   pResourceFlags,
             D3D11_COMMON_TEXTURE_DESC* pTextureDesc);
 
+
+    /**
+     * \brief Returns unupgraded DXGI_FORMAT
+     *
+     * \returns \c DXGI_FORMAT_FORCE_UINT if the format wasn't upgraded
+     */
+    DXGI_FORMAT GetOriginalFormat() {
+      return originalFormat;
+    }
+
   private:
-    
+
+    DXGI_FORMAT originalFormat = DXGI_FORMAT_FORCE_UINT;
+
     struct MappedBuffer {
       Rc<DxvkBuffer>        buffer;
       DxvkBufferSliceHandle slice;
