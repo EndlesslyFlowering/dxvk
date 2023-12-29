@@ -83,7 +83,7 @@ namespace dxvk {
             RenderTargetFormatLogger(m_desc.Format, true)
 #else
   #define DEFAULT_BACK_BUFFER_MAPPING                         \
-            m_mapping = pDevice->LookupFormat(m_desc.Format);
+            m_mapping = pDevice->LookupFormat(m_desc.Format)
 #endif
 
 #ifdef _HDR_DEBUG
@@ -92,7 +92,7 @@ namespace dxvk {
             RenderTargetFormatLogger(m_desc.Format)
 #else
   #define DEFAULT_RENDER_TARGET_MAPPING                       \
-            m_mapping = pDevice->LookupFormat(m_desc.Format);
+            m_mapping = pDevice->LookupFormat(m_desc.Format)
 #endif
 
     if (unlikely(m_desc.IsBackBuffer))
@@ -135,23 +135,26 @@ namespace dxvk {
             DEFAULT_RENDER_TARGET_MAPPING;
           }
         }
-        catch(const std::exception& e) {
-//          uint32_t weirdFormat = static_cast<uint32_t>(m_desc.Format);
-//
-//          char* weirdChars = reinterpret_cast<char*>(&weirdFormat);
-//
-//          char  chars[5] = { ' ', ' ', ' ', ' ', '\0' };
-//          char*   pChars = reinterpret_cast<char*>(&chars);
-//
-//          for (uint32_t i = 0; i < 4; i++) {
-//            *pChars = *weirdChars;
-//            pChars++;
-//            weirdChars++;
-//          }
-//
-//          Logger::info(str::format("D3D9: can't upgrade this format: ",
-//                                   "0x", std::hex, weirdFormat, ": ",
-//                                   chars));
+        catch(const std::exception& e)
+        {
+#ifdef _HDR_DEBUG
+          uint32_t weirdFormat = static_cast<uint32_t>(m_desc.Format);
+
+          char* weirdChars = reinterpret_cast<char*>(&weirdFormat);
+
+          char  chars[5] = { ' ', ' ', ' ', ' ', '\0' };
+          char*   pChars = reinterpret_cast<char*>(&chars);
+
+          for (uint32_t i = 0; i < 4; i++) {
+            *pChars = *weirdChars;
+            pChars++;
+            weirdChars++;
+          }
+
+          Logger::info(str::format("D3D9: can't upgrade this format: ",
+                                   "0x", std::hex, weirdFormat, ": ",
+                                   chars));
+#endif
           DEFAULT_RENDER_TARGET_MAPPING;
         }
       }
