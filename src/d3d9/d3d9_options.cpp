@@ -161,9 +161,6 @@ namespace dxvk {
       Logger::info(str::format("D3D9: back buffer format will be upgraded to: ",
                                GetD3DFormatAsString(upgradedFormat)));
     }
-    else {
-      Logger::info("D3D9: back buffer format upgrade disabled");
-    }
     return upgradedFormat;
   }
 
@@ -339,49 +336,71 @@ namespace dxvk {
     this->enableBackBufferUpgrade       = config.getOption<bool> ("d3d9.enableBackBufferUpgrade",    false);
     this->enableSwapChainUpgrade        = config.getOption<bool> ("d3d9.enableSwapChainUpgrade",     false);
 
+    if (this->enableBackBufferUpgrade)
+    {
+      this->upgradeBackBufferTo =
+        BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeBackBufferTo", "disabled")));
 
-    this->upgradeBackBufferTo =
-      BackBufferFormatUpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeBackBufferTo", "disabled")));
-    if (this->upgradeBackBufferTo == D3DFMT_UNKNOWN) {
-      this->enableBackBufferUpgrade = false;
+      if (this->upgradeBackBufferTo == D3DFMT_UNKNOWN)
+      {
+        this->enableBackBufferUpgrade = false;
+      }
+    }
+    if (!this->enableBackBufferUpgrade)
+    {
+      Logger::info("D3D9: back buffer upgrade disabled!");
     }
 
 
-  this->formatUpgradeArray.fill( { D3DFMT_UNKNOWN } );
+    this->formatUpgradeArray.fill( { D3DFMT_UNKNOWN } );
 
+    if (this->enableRenderTargetUpgrades)
+    {
 #define D3DFORMAT_UPGRADE_HELPER(CfgString, OriginalFormat)                                                          \
           D3DFORMAT_UpgradeHelper(                                                                                   \
             Config::toLower(config.getOption<std::string>("d3d9.upgrade_" CfgString "_renderTargetTo", "disabled")), \
             OriginalFormat,                                                                                          \
             &this->formatUpgradeArray)
 
-    D3DFORMAT_UPGRADE_HELPER("B5G6R5_UNORM",  D3DFMT_R5G6B5);
-    D3DFORMAT_UPGRADE_HELPER("BGR5A1_UNORM",  D3DFMT_A1R5G5B5);
-    D3DFORMAT_UPGRADE_HELPER("BGR5X1_UNORM",  D3DFMT_X1R5G5B5);
-    D3DFORMAT_UPGRADE_HELPER("BGRA4_UNORM",   D3DFMT_A4R4G4B4);
-    D3DFORMAT_UPGRADE_HELPER("BGRX4_UNORM",   D3DFMT_X4R4G4B4);
-    D3DFORMAT_UPGRADE_HELPER("RGBA8_UNORM",   D3DFMT_A8B8G8R8);
-    D3DFORMAT_UPGRADE_HELPER("RGBX8_UNORM",   D3DFMT_X8B8G8R8);
-    D3DFORMAT_UPGRADE_HELPER("BGRA8_UNORM",   D3DFMT_A8R8G8B8);
-    D3DFORMAT_UPGRADE_HELPER("BGRX8_UNORM",   D3DFMT_X8R8G8B8);
-    D3DFORMAT_UPGRADE_HELPER("RGB10A2_UNORM", D3DFMT_A2B10G10R10);
-    D3DFORMAT_UPGRADE_HELPER("BGR10A2_UNORM", D3DFMT_A2R10G10B10);
-    D3DFORMAT_UPGRADE_HELPER("RGBA16_UNORM",  D3DFMT_A16B16G16R16);
-    D3DFORMAT_UPGRADE_HELPER("RGBA16_SFLOAT", D3DFMT_A16B16G16R16F);
+      D3DFORMAT_UPGRADE_HELPER("B5G6R5_UNORM",  D3DFMT_R5G6B5);
+      D3DFORMAT_UPGRADE_HELPER("BGR5A1_UNORM",  D3DFMT_A1R5G5B5);
+      D3DFORMAT_UPGRADE_HELPER("BGR5X1_UNORM",  D3DFMT_X1R5G5B5);
+      D3DFORMAT_UPGRADE_HELPER("BGRA4_UNORM",   D3DFMT_A4R4G4B4);
+      D3DFORMAT_UPGRADE_HELPER("BGRX4_UNORM",   D3DFMT_X4R4G4B4);
+      D3DFORMAT_UPGRADE_HELPER("RGBA8_UNORM",   D3DFMT_A8B8G8R8);
+      D3DFORMAT_UPGRADE_HELPER("RGBX8_UNORM",   D3DFMT_X8B8G8R8);
+      D3DFORMAT_UPGRADE_HELPER("BGRA8_UNORM",   D3DFMT_A8R8G8B8);
+      D3DFORMAT_UPGRADE_HELPER("BGRX8_UNORM",   D3DFMT_X8R8G8B8);
+      D3DFORMAT_UPGRADE_HELPER("RGB10A2_UNORM", D3DFMT_A2B10G10R10);
+      D3DFORMAT_UPGRADE_HELPER("BGR10A2_UNORM", D3DFMT_A2R10G10B10);
+      D3DFORMAT_UPGRADE_HELPER("RGBA16_UNORM",  D3DFMT_A16B16G16R16);
+      D3DFORMAT_UPGRADE_HELPER("RGBA16_SFLOAT", D3DFMT_A16B16G16R16F);
 
 #undef D3DFORMAT_UPGRADE_HELPER
-
-
-    this->upgradeSwapChainFormatTo =
-      VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "disabled")));
-    this->upgradeSwapChainColorSpaceTo =
-      VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "disabled")));
-    if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
-     || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
-      Logger::info("DXVK (D3D9): swap chain upgrade disabled");
-      this->enableSwapChainUpgrade = false;
+    }
+    else
+    {
+      Logger::info("D3D9: render target upgrades disabled");
     }
 
+
+    if (this->enableSwapChainUpgrade)
+    {
+      this->upgradeSwapChainFormatTo =
+        VkFormat_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainFormatTo", "disabled")));
+      this->upgradeSwapChainColorSpaceTo =
+        VkColorSpace_UpgradeHelper(Config::toLower(config.getOption<std::string>("d3d9.upgradeSwapChainColorSpaceTo", "disabled")));
+
+      if (this->upgradeSwapChainFormatTo     == VK_FORMAT_UNDEFINED
+       || this->upgradeSwapChainColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR)
+      {
+        this->enableSwapChainUpgrade = false;
+      }
+    }
+    if (!this->enableSwapChainUpgrade)
+    {
+      Logger::info("DXVK (D3D9): swap chain upgrade disabled");
+    }
 
     std::string strEnforceWindowModeInternally =
       Config::toLower(config.getOption<std::string>("d3d9.enforceWindowModeInternally", "disabled"));
