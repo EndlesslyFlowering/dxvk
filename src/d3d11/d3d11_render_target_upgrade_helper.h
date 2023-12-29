@@ -26,6 +26,13 @@ namespace dxvk
       DXGI_FORMAT UpgradedFormat,
       FORMAT_TYPE UpgradeType);
 
+#ifdef _HDR_DEBUG
+    static void RenderTargetFormatLogger(
+      DXGI_FORMAT OriginalFormat,
+      DXGI_FORMAT UpgradedFormat,
+      FORMAT_TYPE UpgradeType);
+#endif
+
     // static void ViewUpgradeHelper(
     //   DXGI_FORMAT  ResourceFormat,
     //   DXGI_FORMAT* ViewFormat,
@@ -38,11 +45,6 @@ namespace dxvk
 
 #ifdef _HDR_DEBUG
     static std::string GetUpgradeString(
-      FORMAT_TYPE UpgradeType);
-
-    static void RenderTargetFormatLogger(
-      DXGI_FORMAT OriginalFormat,
-      DXGI_FORMAT UpgradedFormat,
       FORMAT_TYPE UpgradeType);
 #endif
 

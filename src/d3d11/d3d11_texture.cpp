@@ -57,6 +57,25 @@ namespace dxvk {
       Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
 #endif
     }
+#ifdef _HDR_DEBUG
+    else
+    {
+      if (m_dxgiUsage & DXGI_USAGE_BACK_BUFFER)
+      {
+        D3D11RenderTargetUpgradeHelper::RenderTargetFormatLogger(m_desc.Format,
+                                                                 DXGI_FORMAT_UNKNOWN,
+                                                                 D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER);
+        Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+      }
+      else if (formatMode == DXGI_VK_FORMAT_MODE_COLOR)
+      {
+        D3D11RenderTargetUpgradeHelper::RenderTargetFormatLogger(m_desc.Format,
+                                                                 DXGI_FORMAT_UNKNOWN,
+                                                                 D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::RENDER_TARGET);
+        Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+      }
+    }
+#endif
 
     DXGI_VK_FORMAT_INFO   formatInfo   = m_device->LookupFormat(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_FAMILY formatFamily = m_device->LookupFamily(m_desc.Format, formatMode);
