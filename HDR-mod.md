@@ -51,8 +51,8 @@ Check [upgrade_***_renderTargetTo](#upgrade__renderTargetTo-d3d9d3d11) for the i
 Individual render target upgrades per format.\
 These may cause visual issues. Check [logRenderTargetFormatsUsed](#logRenderTargetFormatsUsed-d3d9d3d11) to fix those.
 
-Setting `upgrade_***_renderTargetTo = rgba16_float` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
-This needs '[upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11) = rgba16_float' and '[upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11) = scRGB' otherwise they are lost again.\
+Setting `upgrade_***_renderTargetTo = rgba16_sfloat` will allow for outputting 'overbright' data that would otherwise be lost to clipping.\
+This needs '[upgradeSwapChainFormatTo](#upgradeSwapChainFormatTo-d3d9d3d11) = rgba16_sfloat' and '[upgradeSwapChainColorSpaceTo](#upgradeSwapChainColorSpaceTo-d3d9d3d11) = scRGB' otherwise they are lost again.\
 Additionally further post processing is needed to display the game correctly.
 
 what option corresponds to what format:
@@ -67,8 +67,8 @@ what option corresponds to what format:
 | RGB10A2_UNORM | `D3DFMT_A2B10G10R10`   | no                             |
 | BGR10A2_UNORM | `D3DFMT_A2R10G10B10`   | no                             |
 | RGBA16_UNORM  | `D3DFMT_A16B16G16R16`  | no                             |
-| RGBA16_FLOAT  | `D3DFMT_A16B16G16R16F` | yes                            |
-| RGBA32_FLOAT  | `D3DFMT_A32B32G32R32F` | yes                            |
+| RGBA16_SFLOAT | `D3DFMT_A16B16G16R16F` | yes                            |
+| RGBA32_SFLOAT | `D3DFMT_A32B32G32R32F` | yes                            |
 | B5G6R5_UNORM  | `D3DFMT_R5G6B5`        | no                             |
 | BGR5A1_UNORM  | `D3DFMT_A1R5G5B5`      | no                             |
 | BGR5X1_UNORM  | `D3DFMT_X1R5G5B5`      | no                             |
@@ -90,17 +90,17 @@ what option corresponds to what format:
 | BGRX8_TYPELESS   | `DXGI_FORMAT_B8G8R8X8_TYPELESS`     | no                             |
 | RGB10A2_UNORM    | `DXGI_FORMAT_R10G10B10A2_UNORM`     | no                             |
 | RGB10A2_TYPELESS | `DXGI_FORMAT_R10G10B10A2_TYPELESS`  | no                             |
-| RG11B10_FLOAT    | `DXGI_FORMAT_R11G11B10_FLOAT`       | yes*                           |
+| RG11B10_UFLOAT   | `DXGI_FORMAT_R11G11B10_UFLOAT`      | yes*                           |
 | RGBA16_UNORM     | `DXGI_FORMAT_R16G16B16A16_UNORM`    | no                             |
-| RGBA16_FLOAT     | `DXGI_FORMAT_R16G16B16A16_FLOAT`    | yes                            |
+| RGBA16_SFLOAT    | `DXGI_FORMAT_R16G16B16A16_SFLOAT`   | yes                            |
 | RGBA16_TYPELESS  | `DXGI_FORMAT_R16G16B16A16_TYPELESS` | yes**                          |
-| RGBA32_FLOAT     | `DXGI_FORMAT_R32G32B32A32_FLOAT`    | yes                            |
+| RGBA32_SFLOAT    | `DXGI_FORMAT_R32G32B32A32_SFLOAT`   | yes                            |
 | RGBA32_TYPELESS  | `DXGI_FORMAT_R32G32B32A32_TYPELESS` | yes**                          |
 
-\* `RG11B10_FLOAT` is not available as an upgrade option.
+\* `RG11B10_UFLOAT` is not available as an upgrade option.
 
 \** `TYPELESS` formats need to match their bitness siblings.\
-So if you upgrade `RGBA8_UNORM` (8 bit format) to `RGBA16_FLOAT` or `RGBA16_UNORM` (16 bit format) you need to upgrade `RGBA8_TYPELESS` to `RGBA16_TYPELESS` too.\
+So if you upgrade `RGBA8_UNORM` (8 bit format) to `RGBA16_SFLOAT` or `RGBA16_UNORM` (16 bit format) you need to upgrade `RGBA8_TYPELESS` to `RGBA16_TYPELESS` too.\
 When games use `TYPELESS` formats these can cause the most visual issues.
 
 ---
@@ -111,7 +111,7 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 **d3d9.upgrade_BGRA8_UNORM_renderTargetTo**:\
 **d3d9.upgrade_BGRX8_UNORM_renderTargetTo**:
 
-> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -119,21 +119,21 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 **d3d9.upgrade_RGB10A2_UNORM_renderTargetTo**:\
 **d3d9.upgrade_BGR10A2_UNORM_renderTargetTo**:
 
-> Supported values: `disabled`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `disabled`, `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
 
 **d3d9.upgrade_RGBA16_UNORM_renderTargetTo**:
 
-> Supported values: `disabled`, `rgba16_float`, `rgba32_float`\
+> Supported values: `disabled`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
 
-**d3d9.upgrade_RGBA16_FLOAT_renderTargetTo**:
+**d3d9.upgrade_RGBA16_SFLOAT_renderTargetTo**:
 
-> Supported values: `disabled`, `rgba32_float`\
+> Supported values: `disabled`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -143,7 +143,7 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 **d3d11.upgrade_BGRA8_UNORM_renderTargetTo**:\
 **d3d11.upgrade_BGRX8_UNORM_renderTargetTo**:
 
-> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -152,7 +152,7 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 **d3d11.upgrade_BGRA8_UNORM_SRGB_renderTargetTo**:\
 **d3d11.upgrade_BGRX8_UNORM_SRGB_renderTargetTo**:
 
-> Supported values: `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -168,7 +168,7 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 
 **d3d11.upgrade_RGB10A2_UNORM_renderTargetTo**:
 
-> Supported values: `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -180,23 +180,23 @@ When games use `TYPELESS` formats these can cause the most visual issues.
 
 ---
 
-**d3d11.upgrade_RG11B10_FLOAT_renderTargetTo**:
+**d3d11.upgrade_RG11B10_UFLOAT_renderTargetTo**:
 
-> Supported values: `rgba16_float`, `rgba32_float`\
+> Supported values: `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
 
 **d3d11.upgrade_RGBA16_UNORM_renderTargetTo**:
 
-> Supported values: `rgba16_float`, `rgba32_float`\
+> Supported values: `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
 
-**d3d11.upgrade_RGBA16_FLOAT_renderTargetTo**:
+**d3d11.upgrade_RGBA16_SFLOAT_renderTargetTo**:
 
-> Supported values: `rgba32_float`\
+> Supported values: `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -222,7 +222,7 @@ Set the format with [upgradeBackBufferTo](#upgradeBackBufferTo-d3d9d3d11).
 Upgrade the back buffer format to another format.
 Needs '[enableBackBufferUpgrade](#enableBackBufferUpgrade-d3d9d3d11) = True'!
 
-> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`, `rgba32_float`\
+> Supported values: `disabled`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_sfloat`, `rgba32_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -255,7 +255,7 @@ On Windows open up powershell and input this:
 
 Check the logs to see what format is being used and to see if the used format actually works.
 
-> Supported values: `disabled`, `unchanged`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_float`\
+> Supported values: `disabled`, `unchanged`, `rgb10a2_unorm`, `bgr10a2_unorm`, `rgba16_unorm`, `rgba16_sfloat`\
 > Default/Fallback: `disabled`
 
 ---
@@ -311,17 +311,17 @@ Log information about all view types of render targets.
 - output 'overbright' data (needs further post processing):
     ```ini
     d3d9.enableRenderTargetUpgrades           = true
-    d3d9.upgrade_RGBA8_UNORM_renderTargetTo   = rgba16_float
-    d3d9.upgrade_RGBX8_UNORM_renderTargetTo   = rgba16_float
-    d3d9.upgrade_BGRA8_UNORM_renderTargetTo   = rgba16_float
-    d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_float
-    d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_float
-    d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_float
-    d3d9.upgrade_RGBA16_UNORM_renderTargetTo  = rgba32_float
-    d3d9.enableBackBufferUpgrade        = true
-    d3d9.upgradeBackBufferTo            = rgba16_float
+    d3d9.upgrade_RGBA8_UNORM_renderTargetTo   = rgba16_sfloat
+    d3d9.upgrade_RGBX8_UNORM_renderTargetTo   = rgba16_sfloat
+    d3d9.upgrade_BGRA8_UNORM_renderTargetTo   = rgba16_sfloat
+    d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_sfloat
+    d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_sfloat
+    d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_sfloat
+    d3d9.upgrade_RGBA16_UNORM_renderTargetTo  = rgba32_sfloat
+    d3d9.enableBackBufferUpgrade              = true
+    d3d9.upgradeBackBufferTo                  = rgba16_sfloat
     d3d9.enableSwapChainUpgrade               = true
-    d3d9.upgradeSwapChainFormatTo             = rgba16_float
+    d3d9.upgradeSwapChainFormatTo             = rgba16_sfloat
     d3d9.upgradeSwapChainColorSpaceTo         = scRGB
     ```
 
@@ -334,8 +334,8 @@ Log information about all view types of render targets.
     d3d9.upgrade_BGRX8_UNORM_renderTargetTo   = rgba16_unorm
     d3d9.upgrade_RGB10A2_UNORM_renderTargetTo = rgba16_unorm
     d3d9.upgrade_BGR10A2_UNORM_renderTargetTo = rgba16_unorm
-    d3d9.enableBackBufferUpgrade        = true
-    d3d9.upgradeBackBufferTo            = rgba16_unorm
+    d3d9.enableBackBufferUpgrade              = true
+    d3d9.upgradeBackBufferTo                  = rgba16_unorm
     d3d9.enableSwapChainUpgrade               = true
     d3d9.upgradeSwapChainFormatTo             = rgb10a2_unorm
     d3d9.upgradeSwapChainColorSpaceTo         = unchanged
@@ -352,23 +352,23 @@ Log information about all view types of render targets.
 - output 'overbright' data (needs further post processing):
     ```ini
     d3d11.enableRenderTargetUpgrades              = true
-    d3d11.upgrade_RGBA8_UNORM_renderTargetTo      = rgba16_float
-    d3d11.upgrade_BGRA8_UNORM_renderTargetTo      = rgba16_float
-    d3d11.upgrade_BGRX8_UNORM_renderTargetTo      = rgba16_float
-    d3d11.upgrade_RGBA8_UNORM_SRGB_renderTargetTo = rgba16_float
-    d3d11.upgrade_BGRA8_UNORM_SRGB_renderTargetTo = rgba16_float
-    d3d11.upgrade_BGRX8_UNORM_SRGB_renderTargetTo = rgba16_float
+    d3d11.upgrade_RGBA8_UNORM_renderTargetTo      = rgba16_sfloat
+    d3d11.upgrade_BGRA8_UNORM_renderTargetTo      = rgba16_sfloat
+    d3d11.upgrade_BGRX8_UNORM_renderTargetTo      = rgba16_sfloat
+    d3d11.upgrade_RGBA8_UNORM_SRGB_renderTargetTo = rgba16_sfloat
+    d3d11.upgrade_BGRA8_UNORM_SRGB_renderTargetTo = rgba16_sfloat
+    d3d11.upgrade_BGRX8_UNORM_SRGB_renderTargetTo = rgba16_sfloat
     d3d11.upgrade_RGBA8_TYPELESS_renderTargetTo   = rgba16_typeless
     d3d11.upgrade_BGRA8_TYPELESS_renderTargetTo   = rgba16_typeless
     d3d11.upgrade_BGRX8_TYPELESS_renderTargetTo   = rgba16_typeless
-    d3d11.upgrade_RGB10A2_UNORM_renderTargetTo    = rgba16_float
+    d3d11.upgrade_RGB10A2_UNORM_renderTargetTo    = rgba16_sfloat
     d3d11.upgrade_RGB10A2_TYPELESS_renderTargetTo = rgba16_typeless
-    d3d11.upgrade_RG11B10_FLOAT_renderTargetTo    = rgba16_float
-    d3d11.upgrade_RGBA16_UNORM_renderTargetTo     = rgba32_float
-    d3d11.enableBackBufferUpgrade           = true
-    d3d11.upgradeBackBufferTo               = rgba16_float
+    d3d11.upgrade_RG11B10_UFLOAT_renderTargetTo   = rgba16_sfloat
+    d3d11.upgrade_RGBA16_UNORM_renderTargetTo     = rgba32_sfloat
+    d3d11.enableBackBufferUpgrade                 = true
+    d3d11.upgradeBackBufferTo                     = rgba16_sfloat
     d3d11.enableSwapChainUpgrade                  = true
-    d3d11.upgradeSwapChainFormatTo                = rgba16_float
+    d3d11.upgradeSwapChainFormatTo                = rgba16_sfloat
     d3d11.upgradeSwapChainColorSpaceTo            = scRGB
     ```
 
@@ -386,9 +386,9 @@ Log information about all view types of render targets.
     d3d11.upgrade_BGRX8_TYPELESS_renderTargetTo   = rgba16_typeless
     d3d11.upgrade_RGB10A2_UNORM_renderTargetTo    = rgba16_unorm
     d3d11.upgrade_RGB10A2_TYPELESS_renderTargetTo = rgba16_typeless
-    d3d11.upgrade_RG11B10_FLOAT_renderTargetTo    = rgba16_float
-    d3d11.enableBackBufferUpgrade           = true
-    d3d11.upgradeBackBufferTo               = rgba16_unorm
+    d3d11.upgrade_RG11B10_UFLOAT_renderTargetTo   = rgba16_sfloat
+    d3d11.enableBackBufferUpgrade                 = true
+    d3d11.upgradeBackBufferTo                     = rgba16_unorm
     d3d11.enableSwapChainUpgrade                  = true
     d3d11.upgradeSwapChainFormatTo                = rgba10_unorm
     d3d11.upgradeSwapChainColorSpaceTo            = unchanged
