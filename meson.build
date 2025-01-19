@@ -28,12 +28,6 @@ compiler_args = [
   '-Wno-missing-braces',
 ]
 
-if get_option('hdr_debug')
-  compiler_args += [
-    '-D_HDR_DEBUG'
-  ]
-endif
-
 link_args = []
 
 if get_option('build_id')

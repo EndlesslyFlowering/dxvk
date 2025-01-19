@@ -409,9 +409,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.upgradeBackBufferTo,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_SHADER_RESOURCE_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
     else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
@@ -423,9 +421,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::SHADER_RESOURCE_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
 
@@ -445,7 +441,6 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-#ifdef _HDR_DEBUG
     if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Shader Resource View of Render Target created:",
                                "\n  Resource type:    ", resourceDesc.Dim,
@@ -457,7 +452,6 @@ namespace dxvk {
                                enumerateD3d11SrvDesc1(&desc),
                                "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
-#endif
 
     if (!ppSRView)
       return S_FALSE;
@@ -545,9 +539,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.upgradeBackBufferTo,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_UNORDERED_ACCESS_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
     else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
@@ -559,9 +551,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::UNORDERED_ACCESS_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
 
@@ -581,7 +571,6 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-#ifdef _HDR_DEBUG
     if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Unordered Access View of Render Target created:",
                                "\n  Resource type:   ", resourceDesc.Dim,
@@ -593,7 +582,6 @@ namespace dxvk {
                                enumerateD3d11UavDesc1(&desc),
                                "\n  Resource ptr:    0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
-#endif
 
     if (!ppUAView)
       return S_FALSE;
@@ -689,9 +677,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.upgradeBackBufferTo,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::BACK_BUFFER_RENDER_TARGET_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
     else if (m_d3d11Options.enableRenderTargetUpgrades && resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
@@ -703,9 +689,7 @@ namespace dxvk {
           originalFormat,
           m_d3d11Options.formatUpgradeInfoArray[static_cast<size_t>(originalFormat)].upgradedFormat,
           D3D11RenderTargetUpgradeHelper::FORMAT_TYPE::RENDER_TARGET_VIEW);
-#ifdef _HDR_DEBUG
           Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
-#endif
       }
     }
 
@@ -725,7 +709,6 @@ namespace dxvk {
       return E_INVALIDARG;
     }
 
-#ifdef _HDR_DEBUG
     if (resourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) {
       Logger::info(str::format("D3D11: Render Target View created:",
                                "\n  Resource type:    ", resourceDesc.Dim,
@@ -737,7 +720,6 @@ namespace dxvk {
                                enumerateD3d11RtvDesc1(&desc),
                                "\n  Resource ptr:     0x", std::hex, reinterpret_cast<POINTER_SIZE>(pResource)));
     }
-#endif
 
     if (!ppRTView)
       return S_FALSE;
