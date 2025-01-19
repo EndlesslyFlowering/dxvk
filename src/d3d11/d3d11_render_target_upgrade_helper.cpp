@@ -8,11 +8,9 @@ namespace dxvk
     DXGI_FORMAT UpgradedFormat,
     FORMAT_TYPE UpgradeType)
   {
-#ifdef _HDR_DEBUG
     RenderTargetFormatLogger(OriginalFormat,
                              UpgradedFormat,
                              UpgradeType);
-#endif
 
     if (UpgradedFormat != DXGI_FORMAT_UNKNOWN)
     //  && UpgradedFormat < OriginalFormat)
@@ -50,7 +48,6 @@ namespace dxvk
 //    return;
 //  }
 
-#ifdef _HDR_DEBUG
   std::string D3D11RenderTargetUpgradeHelper::GetUpgradeString(
     FORMAT_TYPE UpgradeType)
   {
@@ -87,7 +84,6 @@ namespace dxvk
       return;
     }
   }
-#endif
 
 //  void D3D11RenderTargetUpgradeHelper::ViewLogger(
 //    DXGI_FORMAT ResourceFormat,
