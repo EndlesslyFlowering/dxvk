@@ -12,7 +12,6 @@ namespace dxvk {
 
   bool D3D9CommonTexture::forceDisableRenderTargetUpgrades = false;
 
-#ifdef _HDR_DEBUG
   void D3D9CommonTexture::RenderTargetFormatLogger(
     D3D9Format OriginalFormat,
     bool       IsBackBuffer,
@@ -46,7 +45,6 @@ namespace dxvk {
     }
     return;
   }
-#endif
 
   D3D9CommonTexture::D3D9CommonTexture(
           D3D9DeviceEx*             pDevice,
@@ -77,23 +75,13 @@ namespace dxvk {
       SetAllNeedUpload();
     }
 
-#ifdef _HDR_DEBUG
   #define DEFAULT_BACK_BUFFER_MAPPING                         \
             m_mapping = pDevice->LookupFormat(m_desc.Format); \
             RenderTargetFormatLogger(m_desc.Format, true)
-#else
-  #define DEFAULT_BACK_BUFFER_MAPPING                         \
-            m_mapping = pDevice->LookupFormat(m_desc.Format)
-#endif
 
-#ifdef _HDR_DEBUG
   #define DEFAULT_RENDER_TARGET_MAPPING                       \
             m_mapping = pDevice->LookupFormat(m_desc.Format); \
             RenderTargetFormatLogger(m_desc.Format)
-#else
-  #define DEFAULT_RENDER_TARGET_MAPPING                       \
-            m_mapping = pDevice->LookupFormat(m_desc.Format)
-#endif
 
     if (unlikely(m_desc.IsBackBuffer))
     {
@@ -103,9 +91,7 @@ namespace dxvk {
         if (IsSensibleFormatUpgrade(static_cast<D3DFORMAT>(m_desc.Format), m_device->GetOptions()->upgradeBackBufferTo)) {
           D3D9Format upgradedFormat = D3D9Format(m_device->GetOptions()->upgradeBackBufferTo);
           m_mapping = pDevice->LookupFormat(upgradedFormat);
-#ifdef _HDR_DEBUG
           RenderTargetFormatLogger(m_desc.Format, true, upgradedFormat);
-#endif
         }
         else {
           DEFAULT_BACK_BUFFER_MAPPING;
@@ -127,9 +113,7 @@ namespace dxvk {
 
           if (upgradedFormat != D3D9Format::Unknown) {
             m_mapping = pDevice->LookupFormat(upgradedFormat);
-#ifdef _HDR_DEBUG
             RenderTargetFormatLogger(m_desc.Format, false, upgradedFormat);
-#endif
           }
           else {
             DEFAULT_RENDER_TARGET_MAPPING;
@@ -137,7 +121,6 @@ namespace dxvk {
         }
         catch(const std::exception& e)
         {
-#ifdef _HDR_DEBUG
           uint32_t weirdFormat = static_cast<uint32_t>(m_desc.Format);
 
           char* weirdChars = reinterpret_cast<char*>(&weirdFormat);
@@ -154,7 +137,6 @@ namespace dxvk {
           Logger::info(str::format("D3D9: can't upgrade this format: ",
                                    "0x", std::hex, weirdFormat, ": ",
                                    chars));
-#endif
           DEFAULT_RENDER_TARGET_MAPPING;
         }
       }
