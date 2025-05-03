@@ -1152,6 +1152,9 @@ namespace dxvk {
     if (upgradeColorSpaceTo == VK_COLOR_SPACE_MAX_ENUM_KHR) {
       upgradeColorSpaceTo = m_colorspace;
     }
+    else {
+      m_colorspace = upgradeColorSpaceTo;
+    }
 
 #define SWAP_CHAIN_UPGRADE_THROW_ERROR(OriginalFormat)                                                             \
           throw DxvkError(str::format("DXVK (D3D9): No suitable swap chain upgrade combination found!\n",          \
