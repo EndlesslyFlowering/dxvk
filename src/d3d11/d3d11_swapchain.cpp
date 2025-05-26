@@ -706,17 +706,6 @@ namespace dxvk {
     return maxFrameLatency;
   }
 
-  void D3D11SwapChain::SwapChainUpgradeLogger(
-    const VkFormat        OriginalFormat,
-    const VkFormat        UpgradedFormat,
-    const VkColorSpaceKHR UpgradedColorSpace) {
-
-      Logger::info(str::format("DXVK (D3D11): swap chain upgrade:\n",
-                               "                  from: ", OriginalFormat, " + ", m_colorSpace, "\n",
-                               "                  to:   ", UpgradedFormat, " + ", UpgradedColorSpace));
-    return;
-  }
-
   VkSurfaceFormatKHR D3D11SwapChain::GetSurfaceFormat(DXGI_FORMAT Format) {
 
     VkFormat        upgradeFormatTo     = m_parent->GetOptions()->upgradeSwapChainFormatTo;
@@ -729,13 +718,6 @@ namespace dxvk {
       m_colorSpace = upgradeColorSpaceTo;
     }
 
-#define SWAP_CHAIN_UPGRADE_THROW_ERROR(OriginalFormat)                                                              \
-          throw DxvkError(str::format("DXVK (D3D11): No suitable swap chain upgrade combination found!\n",          \
-                                          "              planned upgrade:\n",                                       \
-                                          "                  from: ", OriginalFormat,  " + ", m_colorSpace, "\n",   \
-                                          "                  to:   ", upgradeFormatTo, " + ", upgradeColorSpaceTo))
-
-
     switch (Format) {
       default:
         Logger::warn(str::format("D3D11SwapChain: Unexpected format: ", m_desc.Format));
@@ -744,29 +726,18 @@ namespace dxvk {
       case DXGI_FORMAT_R8G8B8A8_UNORM:
       case DXGI_FORMAT_B8G8R8A8_UNORM: {
         if (m_parent->GetOptions()->enableSwapChainUpgrade) {
-          VkSurfaceFormatKHR ret;
 
           switch(upgradeFormatTo)
           {
             case VK_FORMAT_R16G16B16A16_SFLOAT:
             case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
-            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
-              ret = { upgradeFormatTo, upgradeColorSpaceTo };
-            } break;
-            case VK_FORMAT_MAX_ENUM: {
-              ret = { VK_FORMAT_R8G8B8A8_UNORM, upgradeColorSpaceTo };
-            } break;
-            default: {
-              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R8G8B8A8_UNORM);
-              ret = { VK_FORMAT_R8G8B8A8_UNORM, m_colorSpace };
-            } break;
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
+              return { upgradeFormatTo, upgradeColorSpaceTo };
+            case VK_FORMAT_MAX_ENUM:
+              return { VK_FORMAT_R8G8B8A8_UNORM, upgradeColorSpaceTo };
+            default:
+              return { VK_FORMAT_R8G8B8A8_UNORM, m_colorSpace };
           }
-
-          SwapChainUpgradeLogger(VK_FORMAT_R8G8B8A8_UNORM,
-                                 upgradeFormatTo,
-                                 upgradeColorSpaceTo);
-
-          return ret;
         }
         else {
           return { VK_FORMAT_R8G8B8A8_UNORM, m_colorSpace };
@@ -776,29 +747,18 @@ namespace dxvk {
       case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
       case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: {
         if (m_parent->GetOptions()->enableSwapChainUpgrade) {
-          VkSurfaceFormatKHR ret;
 
           switch(upgradeFormatTo)
           {
             case VK_FORMAT_R16G16B16A16_SFLOAT:
             case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
-            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
-              ret = { upgradeFormatTo, upgradeColorSpaceTo };
-            } break;
-            case VK_FORMAT_MAX_ENUM: {
-              ret = { VK_FORMAT_R8G8B8A8_SRGB, upgradeColorSpaceTo };
-            } break;
-            default: {
-              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R8G8B8A8_SRGB);
-              ret = { VK_FORMAT_R8G8B8A8_SRGB, m_colorSpace };
-            } break;
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
+              return { upgradeFormatTo, upgradeColorSpaceTo };
+            case VK_FORMAT_MAX_ENUM:
+              return { VK_FORMAT_R8G8B8A8_SRGB, upgradeColorSpaceTo };
+            default:
+              return { VK_FORMAT_R8G8B8A8_SRGB, m_colorSpace };
           }
-
-          SwapChainUpgradeLogger(VK_FORMAT_R8G8B8A8_SRGB,
-                                 upgradeFormatTo,
-                                 upgradeColorSpaceTo);
-
-          return ret;
         }
         else {
           return { VK_FORMAT_R8G8B8A8_SRGB, m_colorSpace };
@@ -807,29 +767,18 @@ namespace dxvk {
 
       case DXGI_FORMAT_R10G10B10A2_UNORM: {
         if (m_parent->GetOptions()->enableSwapChainUpgrade) {
-          VkSurfaceFormatKHR ret;
 
           switch(upgradeFormatTo)
           {
             case VK_FORMAT_R16G16B16A16_SFLOAT:
             case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
-            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: {
-              ret = { upgradeFormatTo, upgradeColorSpaceTo };
-            } break;
-            case VK_FORMAT_MAX_ENUM: {
-              ret = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
-            } break;
-            default: {
-              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_A2B10G10R10_UNORM_PACK32);
-              ret = { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorSpace };
-            } break;
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
+              return { upgradeFormatTo, upgradeColorSpaceTo };
+            case VK_FORMAT_MAX_ENUM:
+              return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, upgradeColorSpaceTo };
+            default:
+              return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorSpace };
           }
-
-          SwapChainUpgradeLogger(VK_FORMAT_A2B10G10R10_UNORM_PACK32,
-                                 upgradeFormatTo,
-                                 upgradeColorSpaceTo);
-
-          return ret;
         }
         else {
           return { VK_FORMAT_A2B10G10R10_UNORM_PACK32, m_colorSpace };
@@ -838,36 +787,22 @@ namespace dxvk {
 
       case DXGI_FORMAT_R16G16B16A16_FLOAT: {
         if (m_parent->GetOptions()->enableSwapChainUpgrade) {
-          VkSurfaceFormatKHR ret;
 
           switch(upgradeFormatTo)
           {
-            case VK_FORMAT_R16G16B16A16_SFLOAT: {
-              ret = { upgradeFormatTo, upgradeColorSpaceTo };
-            } break;
-            case VK_FORMAT_MAX_ENUM: {
-              ret = { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
-            } break;
-            default: {
-              SWAP_CHAIN_UPGRADE_THROW_ERROR(VK_FORMAT_R16G16B16A16_SFLOAT);
-              ret = { VK_FORMAT_R16G16B16A16_SFLOAT, m_colorSpace };
-            } break;
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+              return { upgradeFormatTo, upgradeColorSpaceTo };
+            case VK_FORMAT_MAX_ENUM:
+              return { VK_FORMAT_R16G16B16A16_SFLOAT, upgradeColorSpaceTo };
+            default:
+              return { VK_FORMAT_R16G16B16A16_SFLOAT, m_colorSpace };
           }
-
-          SwapChainUpgradeLogger(VK_FORMAT_R16G16B16A16_SFLOAT,
-                                 upgradeFormatTo,
-                                 upgradeColorSpaceTo);
-
-          return ret;
         }
         else {
           return { VK_FORMAT_R16G16B16A16_SFLOAT, m_colorSpace };
         }
       }
     }
-
-    #undef SWAP_CHAIN_UPGRADE_THROW_ERROR
-
   }
 
 

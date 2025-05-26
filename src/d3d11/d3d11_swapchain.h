@@ -92,11 +92,6 @@ namespace dxvk {
 
   private:
 
-    void SwapChainUpgradeLogger(
-      const VkFormat        OriginalFormat,
-      const VkFormat        UpgradedFormat,
-      const VkColorSpaceKHR UpgradedColorSpace);
-
     using DirtyRectList = small_vector<VkRectLayerKHR, 4>;
 
     enum BindingIds : uint32_t {
