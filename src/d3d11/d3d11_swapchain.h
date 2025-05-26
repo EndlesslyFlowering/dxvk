@@ -92,11 +92,6 @@ namespace dxvk {
 
   private:
 
-    void SwapChainUpgradeLogger(
-      const VkFormat        OriginalFormat,
-      const VkFormat        UpgradedFormat,
-      const VkColorSpaceKHR UpgradedColorSpace);
-
     enum BindingIds : uint32_t {
       Image = 0,
       Gamma = 1,
