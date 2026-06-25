@@ -36,7 +36,9 @@ namespace dxvk {
 
         m_desc.Format = upgradedFormat;
       }
+#if 0
       Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+#endif
     }
     else if (m_device->GetOptions()->enableRenderTargetUpgrades
           && formatMode == DXGI_VK_FORMAT_MODE_COLOR) // DXGI_VK_FORMAT_MODE_COLOR == render target
@@ -52,8 +54,11 @@ namespace dxvk {
 
         m_desc.Format = upgradedFormat;
       }
+#if 0
       Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
+#endif
     }
+#if 0
     else
     {
       if (m_dxgiUsage & DXGI_USAGE_BACK_BUFFER)
@@ -71,6 +76,7 @@ namespace dxvk {
         Logger::info(str::format("       Resource ptr: 0x", std::hex, reinterpret_cast<POINTER_SIZE>(pInterface)));
       }
     }
+#endif
 
     DXGI_VK_FORMAT_INFO   formatInfo   = m_device->LookupFormat(m_desc.Format, formatMode);
     DXGI_VK_FORMAT_FAMILY formatFamily = m_device->LookupFamily(m_desc.Format, formatMode);
