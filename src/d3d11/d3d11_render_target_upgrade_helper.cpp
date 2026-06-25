@@ -8,9 +8,11 @@ namespace dxvk
     DXGI_FORMAT UpgradedFormat,
     FORMAT_TYPE UpgradeType)
   {
+#if 0
     RenderTargetFormatLogger(OriginalFormat,
                              UpgradedFormat,
                              UpgradeType);
+#endif
 
     if (UpgradedFormat != DXGI_FORMAT_UNKNOWN)
     //  && UpgradedFormat < OriginalFormat)
